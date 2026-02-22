@@ -1,0 +1,42 @@
+name: Deploy to Hosting
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Install Dependencies
+        # Tells GitHub to look inside dph-server for composer.json
+        working-directory: ./dph-server
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Install NPM & Build
+        # Tells GitHub to look inside dph-server for package.json
+        working-directory: ./dph-server
+        run: |
+          npm install
+          npm run build
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          # local-dir tells the action to ONLY upload what's inside dph-server
+          local-dir: ./dph-server/
+          server-dir: ./htdocs/ 
+          # Exclude node_modules to save space and avoid InfinityFree file limits
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
