@@ -19,12 +19,6 @@ jobs:
         working-directory: ./dph-server
         run: composer install --no-dev --optimize-autoloader
 
-      - name: Install NPM & Build
-        # Tells GitHub to look inside dph-server for package.json
-        working-directory: ./dph-server
-        run: |
-          npm install
-          npm run build
 
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
