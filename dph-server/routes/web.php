@@ -29,9 +29,14 @@ Route::get('/create-admin', function () {
         'password' => 'password123'
     ]);
 });
+use Illuminate\Support\Facades\File;
 
-Route::get('/', function () {
-    return response()->json([
-        'message' => 'API Server Running'
-    ]);
-});
+Route::get('/{any}', function () {
+    // This loads the React entry point you just moved to the public folder
+    return File::get(public_path('app.html')); 
+})->where('any', '.*');
+// Route::get('/', function () {
+//     return response()->json([
+//         'message' => 'API Server Running'
+//     ]);
+// });
