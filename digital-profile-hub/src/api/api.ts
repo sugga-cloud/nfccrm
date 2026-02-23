@@ -1,11 +1,12 @@
 import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
-
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true, // 1. CRITICAL: Allows cookies/sessions
+  withXSRFToken: true,   // 2. CRITICAL: Tells Axios to read the XSRF-TOKEN cookie
   headers: {
     "Content-Type": "application/json",
-    Accept: "application/json",
+    "Accept": "application/json",
   },
 });
 
