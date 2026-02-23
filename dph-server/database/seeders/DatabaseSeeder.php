@@ -14,12 +14,15 @@ class DatabaseSeeder extends Seeder
      * Seed the application's database.
      */
     public function run(): void
-    {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-    }
+{
+    // Use firstOrCreate to prevent "Duplicate Entry" errors on redeploy
+    User::firstOrCreate(
+        ['email' => 'admin@example.com'], // The unique field to check
+        [
+            'full_name' => 'admin',
+            'role_id' => 1, // Fixed spelling from rold_id
+            'password' => bcrypt('password123'), // Encrypt the password
+        ]
+    );
+}
 }
