@@ -15,7 +15,7 @@ interface QRSectionProps {
 const QRSection = ({ username, theme = "orange" }: QRSectionProps) => {
   const qrRef = useRef<SVGSVGElement>(null);
   const [copied, setCopied] = useState(false);
-  const profileUrl = `${window.location.origin}/profile/${username}`;
+  const profileUrl = `${window.location.origin}/${username}`;
 
   // Theme mapping consistent with ProfileHeader
   const themeClasses = {
