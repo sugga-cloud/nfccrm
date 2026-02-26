@@ -10,10 +10,10 @@ import { cn } from "@/lib/utils";
 
 interface EnquiryFormProps {
   profileId: number;
-  theme?: "orange" | "blue" | "purple" | "emerald" | "rose";
+  theme?: "emerald" | "slate";
 }
 
-const EnquiryForm = ({ profileId, theme = "orange" }: EnquiryFormProps) => {
+const EnquiryForm = ({ profileId, theme = "emerald" }: EnquiryFormProps) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -23,11 +23,8 @@ const EnquiryForm = ({ profileId, theme = "orange" }: EnquiryFormProps) => {
   });
 
   const themeClasses = {
-    orange: "[--form-primary:#f97316] [--form-bg:theme(colors.orange.50)]",
-    blue: "[--form-primary:#3b82f6] [--form-bg:theme(colors.blue.50)]",
-    purple: "[--form-primary:#a855f7] [--form-bg:theme(colors.purple.50)]",
-    emerald: "[--form-primary:#10b981] [--form-bg:theme(colors.emerald.50)]",
-    rose: "[--form-primary:#f43f5e] [--form-bg:theme(colors.rose.50)]",
+    emerald: "[--form-primary:#1B4332] [--form-accent:#2D6A4F] [--form-bg:#F1F8F6]",
+    slate: "[--form-primary:#0F172A] [--form-accent:#334155] [--form-bg:#F8FAFC]",
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,7 +43,6 @@ const EnquiryForm = ({ profileId, theme = "orange" }: EnquiryFormProps) => {
       toast.success("Enquiry sent successfully!");
       setFormData({ name: "", phone: "", email: "", message: "" });
     } catch (error: any) {
-      console.log(error.response.data.message)
       toast.error(error.response?.data?.message || "Failed to send enquiry.");
     } finally {
       setLoading(false);
@@ -54,104 +50,94 @@ const EnquiryForm = ({ profileId, theme = "orange" }: EnquiryFormProps) => {
   };
 
   return (
-    <section className={cn("container py-16 px-4", themeClasses[theme])}>
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="relative mx-auto max-w-2xl"
-      >
-        {/* Background Stack Decor */}
-        <div className="absolute inset-0 translate-x-4 translate-y-4 bg-[var(--form-primary)]/10 rounded-[3rem] -z-10" />
+    <section id="enquiry" className={cn("w-full py-12 bg-white", themeClasses[theme])}>
+      <div className="container mx-auto px-4">
         
-        <div className="bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100">
-          {/* Header */}
-          <div className="bg-slate-900 p-8 text-center text-white">
-            <div className="mx-auto bg-[var(--form-primary)] w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/20">
-              <MessageSquare className="text-white h-6 w-6" />
-            </div>
-            <h2 className="text-2xl font-black italic tracking-tighter uppercase">
-              Get In <span className="text-[var(--form-primary)]">Touch</span>
-            </h2>
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2">
-              Have questions? Send a message
-            </p>
+        {/* Section Header */}
+        <div className="flex flex-col items-center mb-10 text-center">
+          <div className="flex items-center gap-2 mb-1">
+             <MessageSquare className="h-4 w-4 text-[var(--form-accent)]" />
+             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Contact Us</span>
           </div>
+          <h2 className="text-xl font-bold text-slate-800">Send an Enquiry</h2>
+          <div className="w-10 h-1 bg-[var(--form-accent)] mt-1.5 rounded-full" />
+        </div>
 
-          <form className="p-8 md:p-12 space-y-6" id="enquiry-section" onSubmit={handleSubmit}>
-            {/* Name Field */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-4 top-3 h-4 w-4 text-slate-400" />
-                <Input 
-                  className="pl-11 h-12 rounded-2xl bg-slate-50 border-none focus-visible:ring-2 focus-visible:ring-[var(--form-primary)] font-medium"
-                  placeholder="John Doe" 
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                />
-              </div>
-            </div>
-
-            {/* Contact Info Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mx-auto max-w-xl"
+        >
+          <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden p-6 md:p-10">
+            <form className="space-y-5" onSubmit={handleSubmit}>
+              
+              {/* Name Field */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone</label>
                 <div className="relative">
-                  <Phone className="absolute left-4 top-3 h-4 w-4 text-slate-400" />
+                  <User className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
                   <Input 
-                    className="pl-11 h-12 rounded-2xl bg-slate-50 border-none focus-visible:ring-2 focus-visible:ring-[var(--form-primary)] font-medium"
-                    placeholder="+1 234..." 
+                    className="pl-11 h-12 rounded-xl bg-slate-50 border-slate-100 focus:bg-white transition-all font-medium text-sm"
+                    placeholder="Full Name" 
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              {/* Grid for Phone and Email */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative">
+                  <Phone className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
+                  <Input 
+                    className="pl-11 h-12 rounded-xl bg-slate-50 border-slate-100 focus:bg-white transition-all font-medium text-sm"
+                    placeholder="Phone" 
                     type="tel" 
                     value={formData.phone}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
                   />
                 </div>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-3 h-4 w-4 text-slate-400" />
+                  <Mail className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
                   <Input 
-                    className="pl-11 h-12 rounded-2xl bg-slate-50 border-none focus-visible:ring-2 focus-visible:ring-[var(--form-primary)] font-medium"
-                    placeholder="john@example.com" 
+                    className="pl-11 h-12 rounded-xl bg-slate-50 border-slate-100 focus:bg-white transition-all font-medium text-sm"
+                    placeholder="Email" 
                     type="email" 
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                   />
                 </div>
               </div>
-            </div>
 
-            {/* Message Field */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Your Message</label>
-              <Textarea 
-                className="rounded-[2rem] bg-slate-50 border-none focus-visible:ring-2 focus-visible:ring-[var(--form-primary)] font-medium p-5"
-                placeholder="How can we help you?" 
-                rows={4} 
-                value={formData.message}
-                onChange={(e) => setFormData({...formData, message: e.target.value})}
-              />
-            </div>
+              {/* Message Field */}
+              <div className="space-y-1.5">
+                <Textarea 
+                  className="rounded-xl bg-slate-50 border-slate-100 focus:bg-white transition-all font-medium p-4 text-sm resize-none"
+                  placeholder="How can we help you?" 
+                  rows={4} 
+                  value={formData.message}
+                  onChange={(e) => setFormData({...formData, message: e.target.value})}
+                />
+              </div>
 
-            <Button 
-              className="w-full h-14 bg-slate-900 hover:bg-black text-white rounded-2xl font-black uppercase tracking-widest transition-all shadow-xl" 
-              type="submit" 
-              disabled={loading}
-            >
-              {loading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <>
-                  <Send className="mr-2 h-4 w-4 text-[var(--form-primary)]" />
-                  Submit Enquiry
-                </>
-              )}
-            </Button>
-          </form>
-        </div>
-      </motion.div>
+              <Button 
+                className="w-full h-12 bg-slate-900 hover:bg-black text-white rounded-xl font-bold text-sm transition-all shadow-md group" 
+                type="submit" 
+                disabled={loading}
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <span className="flex items-center gap-2">
+                    Submit Enquiry
+                    <Send className="h-3.5 w-3.5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform text-[var(--form-accent)]" />
+                  </span>
+                )}
+              </Button>
+            </form>
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 };

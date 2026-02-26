@@ -112,6 +112,7 @@ if ($activeSubscription) {
             'whatsapp'            => 'nullable|string',
             'website'             => 'nullable|string',
             'google_map_link'     => 'nullable|string',
+            'address'     => 'nullable|string',
             'profile_image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', // 2MB Max
             'cover_image'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120', // 5MB Max
         ]);

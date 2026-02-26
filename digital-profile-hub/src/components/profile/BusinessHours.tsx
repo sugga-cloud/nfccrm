@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Clock, Calendar, ChevronRight } from "lucide-react";
+import { Clock, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface BusinessHourRow {
@@ -11,20 +11,18 @@ interface BusinessHourRow {
 
 interface BusinessHoursProps {
   data: BusinessHourRow[] | null;
-  theme?: "orange" | "blue" | "purple" | "emerald" | "rose";
+  theme?: "emerald" | "slate";
 }
 
+// Helper to get the current weekday name
 const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
 
-const BusinessHours = ({ data, theme = "orange" }: BusinessHoursProps) => {
+const BusinessHours = ({ data, theme = "emerald" }: BusinessHoursProps) => {
   if (!data || data.length === 0) return null;
 
   const themeClasses = {
-    orange: "[--hr-primary:#f97316] [--hr-bg:theme(colors.orange.50)]",
-    blue: "[--hr-primary:#3b82f6] [--hr-bg:theme(colors.blue.50)]",
-    purple: "[--hr-primary:#a855f7] [--hr-bg:theme(colors.purple.50)]",
-    emerald: "[--hr-primary:#10b981] [--hr-bg:theme(colors.emerald.50)]",
-    rose: "[--hr-primary:#f43f5e] [--hr-bg:theme(colors.rose.50)]",
+    emerald: "[--hr-accent:#2D6A4F] [--hr-light:#D8F3DC]",
+    slate: "[--hr-accent:#334155] [--hr-light:#F1F5F9]",
   };
 
   const formatTime = (time: string | null) => {
@@ -37,74 +35,67 @@ const BusinessHours = ({ data, theme = "orange" }: BusinessHoursProps) => {
   };
 
   return (
-    <section className={cn("w-full py-16 px-4 md:px-6", themeClasses[theme])}>
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        className="max-w-3xl mx-auto flex flex-col items-center mb-10"
-      >
-        <div className="flex items-center gap-2 mb-2">
-           <Clock className="h-4 w-4 text-[var(--hr-primary)]" />
-           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Availability</p>
-        </div>
-        <h2 className="text-3xl font-black italic tracking-tighter uppercase text-slate-900">
-          Business <span className="text-[var(--hr-primary)]">Hours</span>
-        </h2>
-      </motion.div>
+    <section className={cn("w-full py-12 bg-white", themeClasses[theme])}>
+      <div className="container mx-auto px-4">
+        
+        {/* Section Header */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          className="flex flex-col items-center mb-8"
+        >
+          <div className="flex items-center gap-2 mb-1">
+             <Clock className="h-4 w-4 text-[var(--hr-accent)]" />
+             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Schedule</span>
+          </div>
+          <h2 className="text-xl font-bold text-slate-800">Business Hours</h2>
+          <div className="w-10 h-1 bg-[var(--hr-accent)] mt-1.5 rounded-full" />
+        </motion.div>
 
-      <div className="max-w-3xl mx-auto space-y-3">
-        {data.map((row, index) => {
-          const isToday = row.day === today;
-          const isOpen = !row.is_closed;
+        {/* Clean Row List */}
+        <div className="max-w-md mx-auto bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+          {data.map((row, index) => {
+            const isToday = row.day === today;
+            const isOpen = !row.is_closed;
 
-          return (
-            <motion.div
-              key={row.day}
-              initial={{ opacity: 0, x: -10 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className={cn(
-                "relative flex items-center justify-between p-5 rounded-[1.5rem] transition-all duration-300",
-                isToday 
-                  ? "bg-slate-900 text-white shadow-xl scale-[1.02] z-10" 
-                  : "bg-white border border-slate-100 text-slate-600 hover:border-[var(--hr-primary)]"
-              )}
-            >
-              <div className="flex items-center gap-4">
-                <div className={cn(
-                  "h-10 w-10 rounded-xl flex items-center justify-center",
-                  isToday ? "bg-[var(--hr-primary)]" : "bg-slate-50"
-                )}>
-                  <Calendar className={cn("h-5 w-5", isToday ? "text-white" : "text-slate-400")} />
-                </div>
-                <div>
-                  <h3 className={cn("text-sm font-black uppercase tracking-tight", isToday ? "text-white" : "text-slate-900")}>
+            return (
+              <div
+                key={row.day}
+                className={cn(
+                  "flex items-center justify-between px-6 py-4 border-b border-slate-50 last:border-none transition-colors",
+                  isToday ? "bg-[var(--hr-light)]/30" : "hover:bg-slate-50/50"
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  {/* Small Indicator for Today */}
+                  <div className={cn(
+                    "w-1.5 h-1.5 rounded-full",
+                    isToday ? "bg-[var(--hr-accent)] animate-pulse" : "bg-transparent"
+                  )} />
+                  
+                  <span className={cn(
+                    "text-sm font-bold",
+                    isToday ? "text-slate-900" : "text-slate-600"
+                  )}>
                     {row.day}
-                    {isToday && <span className="ml-2 text-[10px] text-[var(--hr-primary)] animate-pulse">● Today</span>}
-                  </h3>
+                  </span>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-6">
                 <div className="text-right">
                   {isOpen ? (
-                    <p className={cn("text-sm font-bold italic", isToday ? "text-slate-300" : "text-slate-500")}>
-                      {formatTime(row.open_time)} <span className="mx-1 opacity-50">–</span> {formatTime(row.close_time)}
+                    <p className="text-xs font-semibold text-slate-800 tracking-tight">
+                      {formatTime(row.open_time)} <span className="mx-1 text-slate-300 font-normal">to</span> {formatTime(row.close_time)}
                     </p>
                   ) : (
-                    <p className="text-sm font-bold uppercase tracking-widest text-red-500 italic opacity-80">Closed</p>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-red-400">
+                      Closed
+                    </span>
                   )}
                 </div>
-                {!isToday && <ChevronRight className="h-4 w-4 text-slate-200" />}
               </div>
-
-              {/* Decorative background glow for Today */}
-              {isToday && (
-                <div className="absolute inset-0 bg-[var(--hr-primary)]/20 blur-2xl rounded-full -z-10" />
-              )}
-            </motion.div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </section>
   );

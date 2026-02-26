@@ -1,147 +1,80 @@
 import { motion } from "framer-motion";
-import { Download, Link as LinkIcon, Check, QrCode, FileType } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { QrCode } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 interface QRSectionProps {
   username: string;
-  theme?: "orange" | "blue" | "purple" | "emerald" | "rose";
+  profileImage?: string; // Optional: To place in the center of the QR
+  theme?: "emerald" | "slate";
 }
 
-const QRSection = ({ username, theme = "orange" }: QRSectionProps) => {
-  const qrRef = useRef<SVGSVGElement>(null);
-  const [copied, setCopied] = useState(false);
+const QRSection = ({ username, profileImage, theme = "emerald" }: QRSectionProps) => {
   const profileUrl = `${window.location.origin}/profile/${username}`;
 
-  // Theme mapping consistent with ProfileHeader
+  // Darker professional colors matching our new ProfileHeader
   const themeClasses = {
-    orange: "[--qr-primary:#f97316] [--qr-bg:theme(colors.orange.50)]",
-    blue: "[--qr-primary:#3b82f6] [--qr-bg:theme(colors.blue.50)]",
-    purple: "[--qr-primary:#a855f7] [--qr-bg:theme(colors.purple.50)]",
-    emerald: "[--qr-primary:#10b981] [--qr-bg:theme(colors.emerald.50)]",
-    rose: "[--qr-primary:#f43f5e] [--qr-bg:theme(colors.rose.50)]",
-  };
-
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(profileUrl);
-      setCopied(true);
-      toast.success("Link copied to clipboard!");
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      toast.error("Failed to copy link");
-    }
-  };
-
-  const downloadQR = () => {
-    const svg = qrRef.current;
-    if (!svg) return;
-
-    const svgData = new XMLSerializer().serializeToString(svg);
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-    
-    img.onload = () => {
-      // Add padding for a cleaner look in the PNG
-      const padding = 40;
-      canvas.width = img.width + padding;
-      canvas.height = img.height + padding;
-      
-      if (ctx) {
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, padding / 2, padding / 2);
-      }
-      
-      const pngFile = canvas.toDataURL("image/png");
-      const downloadLink = document.createElement("a");
-      downloadLink.download = `${username}-nfc-qr.png`;
-      downloadLink.href = pngFile;
-      downloadLink.click();
-    };
-
-    img.src = "data:image/svg+xml;base64," + btoa(svgData);
+    emerald: "[--qr-text:#2D6A4F] [--qr-accent:#40916C]",
+    slate: "[--qr-text:#1E293B] [--qr-accent:#334155]",
   };
 
   return (
-    <section className={cn("container py-12", themeClasses[theme])}>
+    <section className={cn("py-12 bg-white flex flex-col items-center", themeClasses[theme])}>
+      {/* Section Title - Matches "QR Code" header in Screenshot 2/3 */}
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="text-center mb-8"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        className="text-center mb-6"
       >
-        <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-[var(--qr-bg)] text-[var(--qr-primary)] mb-3">
-          <QrCode className="h-6 w-6" />
-        </div>
-        <h2 className="text-2xl font-black italic tracking-tighter uppercase text-slate-900">
-          Share Your <span className="text-[var(--qr-primary)]">Profile</span>
-        </h2>
+        <h2 className="text-xl font-bold text-slate-800">QR Code</h2>
+        <div className="w-10 h-1 bg-[var(--qr-accent)] mx-auto mt-1 rounded-full" />
       </motion.div>
 
-      <Card className="mx-auto max-w-sm border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white">
-        <CardContent className="flex flex-col items-center gap-6 p-8">
-          
-          {/* QR Code Container */}
-          <motion.div 
-            whileHover={{ scale: 1.02 }}
-            className="relative p-4 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200"
-          >
-            <div className="bg-white p-3 rounded-2xl shadow-inner">
-              <QRCodeSVG
-                value={profileUrl}
-                size={200}
-                level={"H"}
-                includeMargin={false}
-                ref={qrRef}
-                fgColor="currentColor"
-                className="text-slate-900"
-              />
-            </div>
-          </motion.div>
-
-          {/* URL Box */}
-          <div className="w-full space-y-2">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Profile URL</p>
-            <div className="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-100 group">
-              <p className="flex-1 text-[11px] font-bold text-slate-600 truncate pl-2 italic">
-                {profileUrl}
-              </p>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-8 w-8 rounded-lg hover:bg-[var(--qr-bg)] hover:text-[var(--qr-primary)]"
-                onClick={copyToClipboard}
-              >
-                {copied ? <Check className="h-4 w-4 text-green-500" /> : <LinkIcon className="h-4 w-4" />}
-              </Button>
-            </div>
+      {/* QR Card Container */}
+      <div className="relative group">
+        {/* Subtle decorative shadow behind the QR */}
+        <div className="absolute -inset-4 bg-slate-50 rounded-[2.5rem] scale-95 group-hover:scale-100 transition-transform duration-500" />
+        
+        <motion.div 
+          initial={{ scale: 0.9, opacity: 0 }}
+          whileInView={{ scale: 1, opacity: 1 }}
+          viewport={{ once: true }}
+          className="relative bg-white p-8 rounded-[2rem] shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] border border-slate-100"
+        >
+          {/* Branded Icon on top of QR as seen in screenshots */}
+          <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-slate-900 p-2 rounded-full border-4 border-white shadow-md">
+            <QrCode className="w-5 h-5 text-white" />
           </div>
 
-          {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-3 w-full">
-            <Button 
-              className="bg-slate-900 hover:bg-black text-white rounded-xl font-bold text-xs uppercase tracking-widest h-11 gap-2 shadow-lg"
-              onClick={downloadQR}
-            >
-              <Download className="h-4 w-4" /> PNG
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              className="border-slate-200 hover:border-[var(--qr-primary)] hover:text-[var(--qr-primary)] rounded-xl font-bold text-xs uppercase tracking-widest h-11 gap-2"
-              onClick={() => window.print()}
-            >
-              <FileType className="h-4 w-4" /> Print
-            </Button>
+          <div className="bg-white rounded-xl overflow-hidden">
+            <QRCodeSVG
+              value={profileUrl}
+              size={180}
+              level={"H"}
+              includeMargin={false}
+              // UnoGreen style often has the brand logo in center
+              imageSettings={profileImage ? {
+                src: profileImage,
+                x: undefined,
+                y: undefined,
+                height: 40,
+                width: 40,
+                excavate: true,
+              } : undefined}
+            />
           </div>
-        </CardContent>
-      </Card>
+        </motion.div>
+      </div>
+
+      {/* Action Prompt */}
+      <motion.p 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="mt-6 text-slate-400 text-xs font-medium uppercase tracking-widest"
+      >
+        Scan to save contact
+      </motion.p>
     </section>
   );
 };

@@ -16,13 +16,13 @@ import { toast } from "sonner";
 interface AppointmentBookingProps {
   profileId: number;
   customTimeSlots?: string[];
-  theme?: "orange" | "blue" | "purple" | "emerald" | "rose";
+  theme?: "emerald" | "slate";
 }
 
 const AppointmentBooking = ({ 
   profileId, 
   customTimeSlots, 
-  theme = "orange" 
+  theme = "emerald" 
 }: AppointmentBookingProps) => {
   const [date, setDate] = useState<Date>();
   const [slot, setSlot] = useState("");
@@ -31,11 +31,8 @@ const AppointmentBooking = ({
   const [isBooked, setIsBooked] = useState(false);
 
   const themeClasses = {
-    orange: "[--apt-primary:#f97316] [--apt-bg:theme(colors.orange.50)]",
-    blue: "[--apt-primary:#3b82f6] [--apt-bg:theme(colors.blue.50)]",
-    purple: "[--apt-primary:#a855f7] [--apt-bg:theme(colors.purple.50)]",
-    emerald: "[--apt-primary:#10b981] [--apt-bg:theme(colors.emerald.50)]",
-    rose: "[--apt-primary:#f43f5e] [--apt-bg:theme(colors.rose.50)]",
+    emerald: "[--apt-primary:#2D6A4F] [--apt-accent:#40916C] [--apt-bg:#F1F8F6]",
+    slate: "[--apt-primary:#1E293B] [--apt-accent:#334155] [--apt-bg:#F8FAFC]",
   };
 
   const availableSlots = customTimeSlots || [
@@ -63,7 +60,6 @@ const AppointmentBooking = ({
       setIsBooked(true);
       toast.success("Booking request sent!");
     } catch (error: any) {
-      console.log(error.response.data)
       toast.error(error.response?.data?.message || "Booking failed.");
     } finally {
       setLoading(false);
@@ -71,124 +67,122 @@ const AppointmentBooking = ({
   };
 
   return (
-    <section className={cn("w-full py-16 px-4 md:px-6", themeClasses[theme])}>
-      <div className="max-w-3xl mx-auto">
-        <AnimatePresence mode="wait">
-          {isBooked ? (
-            <motion.div 
-              key="success"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-[2.5rem] p-10 text-center shadow-2xl border border-slate-100 relative overflow-hidden"
-            >
-              <div className="absolute top-0 left-0 w-full h-2 bg-[var(--apt-primary)]" />
-              <div className="mx-auto h-20 w-20 rounded-full bg-emerald-50 flex items-center justify-center mb-6">
-                <CheckCircle2 className="h-10 w-10 text-emerald-500" />
-              </div>
-              <h2 className="text-3xl font-black italic uppercase tracking-tighter text-slate-900">Request Sent</h2>
-              <p className="text-slate-500 mt-4 max-w-xs mx-auto font-medium">
-                We've received your request for <span className="text-slate-900 font-bold">{slot}</span> on <span className="text-slate-900 font-bold">{date && format(date, "PPP")}</span>.
-              </p>
-              <Button 
-                variant="outline" 
-                className="mt-8 h-12 rounded-2xl px-8 border-slate-200 font-bold uppercase tracking-widest text-[10px]"
-                onClick={() => setIsBooked(false)}
+    <section className={cn("w-full py-12 bg-white", themeClasses[theme])}>
+      <div className="container mx-auto px-4">
+        {/* Simple Section Header */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="flex items-center gap-2 mb-1">
+             <CalendarIcon className="h-4 w-4 text-[var(--apt-primary)]" />
+             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Schedule</span>
+          </div>
+          <h2 className="text-xl font-bold text-slate-800">Book Appointment</h2>
+          <div className="w-10 h-1 bg-[var(--apt-primary)] mt-1.5 rounded-full" />
+        </div>
+
+        <div className="max-w-2xl mx-auto">
+          <AnimatePresence mode="wait">
+            {isBooked ? (
+              <motion.div 
+                key="success"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-white rounded-[2rem] p-10 text-center border border-slate-100 shadow-sm"
               >
-                Schedule Another
-              </Button>
-            </motion.div>
-          ) : (
-            <motion.div 
-              key="form"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-50"
-            >
-              {/* Header */}
-              <div className="bg-slate-900 p-8 md:p-10 text-white flex flex-col md:flex-row justify-between items-center gap-4">
-                <div className="text-center md:text-left">
-                  <div className="flex items-center gap-2 justify-center md:justify-start mb-2">
-                    <Sparkles className="h-4 w-4 text-[var(--apt-primary)]" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Booking</span>
-                  </div>
-                  <h2 className="text-3xl font-black italic uppercase tracking-tighter">Reserve <span className="text-[var(--apt-primary)]">Time</span></h2>
+                <div className="mx-auto h-16 w-16 rounded-full bg-emerald-50 flex items-center justify-center mb-6">
+                  <CheckCircle2 className="h-8 w-8 text-emerald-500" />
                 </div>
-                <Clock className="h-12 w-12 text-white/10 hidden md:block" />
-              </div>
-
-              <div className="p-8 md:p-12 space-y-8">
-                {/* Step 1: Personal Details */}
-                <div className="space-y-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">1. Your Information</p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <h2 className="text-2xl font-bold text-slate-900">Request Sent</h2>
+                <p className="text-slate-500 mt-3 text-sm font-medium">
+                  We'll contact you for <span className="text-slate-900 font-bold">{slot}</span> on <span className="text-slate-900 font-bold">{date && format(date, "PPP")}</span>.
+                </p>
+                <Button 
+                  variant="outline" 
+                  className="mt-8 rounded-xl px-8 border-slate-200 font-bold text-xs"
+                  onClick={() => setIsBooked(false)}
+                >
+                  Schedule Another
+                </Button>
+              </motion.div>
+            ) : (
+              <motion.div 
+                key="form"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                {/* Step 1: Info */}
+                <div className="grid grid-cols-1 gap-4">
+                   <div className="relative">
+                    <User className="absolute left-4 top-3 h-4 w-4 text-slate-400" />
+                    <Input placeholder="Full Name" className="pl-11 h-12 rounded-xl bg-slate-50 border-slate-100 focus:bg-white" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="relative">
-                      <User className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
-                      <Input placeholder="Full Name" className="pl-11 h-12 rounded-2xl bg-slate-50 border-none font-medium" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                      <Mail className="absolute left-4 top-3 h-4 w-4 text-slate-400" />
+                      <Input placeholder="Email Address" className="pl-11 h-12 rounded-xl bg-slate-50 border-slate-100 focus:bg-white" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
                     </div>
                     <div className="relative">
-                      <Mail className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
-                      <Input placeholder="Email" className="pl-11 h-12 rounded-2xl bg-slate-50 border-none font-medium" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
-                    </div>
-                    <div className="relative">
-                      <Phone className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
-                      <Input placeholder="Phone" className="pl-11 h-12 rounded-2xl bg-slate-50 border-none font-medium" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
+                      <Phone className="absolute left-4 top-3 h-4 w-4 text-slate-400" />
+                      <Input placeholder="Phone Number" className="pl-11 h-12 rounded-xl bg-slate-50 border-slate-100 focus:bg-white" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
                     </div>
                   </div>
                 </div>
 
-                {/* Step 2: Date & Time */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">2. Select Date</p>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full h-14 rounded-2xl border-2 border-slate-100 hover:border-[var(--apt-primary)] justify-between px-6 text-lg font-bold italic tracking-tight">
-                          {date ? format(date, "MMM dd, yyyy") : "Choose Date"}
-                          <CalendarIcon className="h-5 w-5 text-[var(--apt-primary)]" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 rounded-3xl overflow-hidden border-none shadow-2xl" align="start">
-                        <Calendar mode="single" selected={date} onSelect={setDate} disabled={(d) => d < new Date()} />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
+                {/* Step 2: Date Picker */}
+                <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="flex-1 space-y-3">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">1. Select Date</label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="w-full h-12 rounded-xl border-slate-200 justify-between px-4 bg-white">
+                            {date ? format(date, "PPP") : "Choose a date"}
+                            <CalendarIcon className="h-4 w-4 text-[var(--apt-primary)]" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0 border-none shadow-xl rounded-2xl" align="start">
+                          <Calendar mode="single" selected={date} onSelect={setDate} disabled={(d) => d < new Date()} />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
 
-                  <div className="space-y-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">3. Select Slot</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      {availableSlots.map((t) => (
-                        <button
-                          key={t}
-                          onClick={() => setSlot(t)}
-                          className={cn(
-                            "h-12 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all border-2",
-                            slot === t 
-                              ? "bg-slate-900 border-slate-900 text-white shadow-lg" 
-                              : "border-slate-50 bg-slate-50 text-slate-500 hover:border-slate-200"
-                          )}
-                        >
-                          {t}
-                        </button>
-                      ))}
+                    <div className="flex-1 space-y-3">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">2. Select Time</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {availableSlots.slice(0, 4).map((t) => (
+                          <button
+                            key={t}
+                            onClick={() => setSlot(t)}
+                            className={cn(
+                              "h-10 rounded-lg text-[10px] font-bold uppercase transition-all border",
+                              slot === t 
+                                ? "bg-[var(--apt-primary)] border-[var(--apt-primary)] text-white shadow-md" 
+                                : "bg-white border-slate-200 text-slate-600 hover:border-slate-400"
+                            )}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <Button 
-                  className="w-full h-16 bg-[var(--apt-primary)] hover:opacity-90 text-white rounded-2xl text-lg font-black italic uppercase tracking-tighter shadow-xl shadow-[var(--apt-primary)]/20 group"
+                  className="w-full h-14 bg-[var(--apt-primary)] hover:bg-[var(--apt-accent)] text-white rounded-xl text-sm font-bold shadow-lg transition-all"
                   disabled={loading || !date || !slot || !formData.name}
                   onClick={handleBooking}
                 >
-                  {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : (
+                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : (
                     <span className="flex items-center gap-2">
-                      Confirm Appointment <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                      Confirm Booking <ChevronRight className="h-4 w-4" />
                     </span>
                   )}
                 </Button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </section>
   );

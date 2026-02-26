@@ -16,7 +16,7 @@ import BottomContactBar from "@/components/profile/BottomContactBar";
 import { Separator } from "@/components/ui/separator";
 import { Loader2, AlertTriangle } from "lucide-react";
 import CartFloatingButton from "@/components/layout/CartFloatingButton";
-
+import MapSection from "@/components/profile/MapSection";
 const PublicProfile = () => {
   const { username } = useParams<{ username: string }>();
   const [loading, setLoading] = useState(true);
@@ -36,7 +36,7 @@ const PublicProfile = () => {
         const actualData = response.data.data || response.data;
         
         setProfileData(actualData);
-        
+        console.log(actualData)
         // Use actualData.id because response.data might be the wrapper
         if (actualData?.id) {
           localStorage.setItem(`profileId`, actualData.id.toString());
@@ -83,8 +83,8 @@ const PublicProfile = () => {
       
       {/* 2. Contact Buttons & Social Links */}
       {/* Use optional chaining to prevent crash if 'profile' key is missing */}
-      <ContactSocial data={profileData} /> 
-      
+      {/* <ContactSocial data={profileData} /> 
+       */}
       <Separator className="opacity-50" />
 
       {/* 3. Dynamic QR Code */}
@@ -139,7 +139,7 @@ const PublicProfile = () => {
         <Separator className="my-8 opacity-50" />
         <EnquiryForm profileId={profileData.id} />
       </div>
-
+      <MapSection profile={profileData}/>
       {/* 10. Sticky Mobile Bar */}
       <BottomContactBar profile={profileData} />
     </MainLayout>

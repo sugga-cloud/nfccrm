@@ -226,6 +226,10 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 <Input name="google_map_link" defaultValue={profile?.google_map_link} readOnly={!isEditing} className={`h-11 ${!isEditing ? 'bg-slate-50' : ''}`} />
               </div>
               <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-700">Address</label>
+                <Input name="address" defaultValue={profile?.address} readOnly={!isEditing} className={`h-11 ${!isEditing ? 'bg-slate-50' : ''}`} />
+              </div>
+              <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Website</label>
                 <Input name="website" defaultValue={profile?.website} readOnly={!isEditing} className={`h-11 ${!isEditing ? 'bg-slate-50' : ''}`} />
               </div>
