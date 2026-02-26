@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->string('email')->nullable();
             $table->string('whatsapp')->nullable();
             $table->text('google_map_link')->nullable();
+            $table->text('address')->nullable();
             $table->string('website')->nullable();
             $table->string('qr_code_path')->nullable();
             $table->boolean('is_active')->default(true);
