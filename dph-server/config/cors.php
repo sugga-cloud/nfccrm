@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://nfccrm.netlify.app'], // React app
+    'allowed_origins' => ['*'], // React app
 
     'allowed_origins_patterns' => [],
 
