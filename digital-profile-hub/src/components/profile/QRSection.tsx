@@ -1,147 +1,135 @@
 import { motion } from "framer-motion";
-import { Download, Link as LinkIcon, Check, QrCode, FileType } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { QrCode, Download } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+import { useRef } from "react";
 
 interface QRSectionProps {
   username: string;
-  theme?: "orange" | "blue" | "purple" | "emerald" | "rose";
+  profileImage?: string;
+  theme: any; 
+  ui: any;
 }
 
-const QRSection = ({ username, theme = "orange" }: QRSectionProps) => {
+const QRSection = ({ username, profileImage, theme, ui }: QRSectionProps) => {
+  const profileUrl = `${window.location.origin}/profile/${username}`;
   const qrRef = useRef<SVGSVGElement>(null);
-  const [copied, setCopied] = useState(false);
-  const profileUrl = `${window.location.origin}/${username}`;
-
-  // Theme mapping consistent with ProfileHeader
-  const themeClasses = {
-    orange: "[--qr-primary:#f97316] [--qr-bg:theme(colors.orange.50)]",
-    blue: "[--qr-primary:#3b82f6] [--qr-bg:theme(colors.blue.50)]",
-    purple: "[--qr-primary:#a855f7] [--qr-bg:theme(colors.purple.50)]",
-    emerald: "[--qr-primary:#10b981] [--qr-bg:theme(colors.emerald.50)]",
-    rose: "[--qr-primary:#f43f5e] [--qr-bg:theme(colors.rose.50)]",
-  };
-
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(profileUrl);
-      setCopied(true);
-      toast.success("Link copied to clipboard!");
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      toast.error("Failed to copy link");
-    }
-  };
 
   const downloadQR = () => {
     const svg = qrRef.current;
     if (!svg) return;
-
     const svgData = new XMLSerializer().serializeToString(svg);
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     const img = new Image();
-    
     img.onload = () => {
-      // Add padding for a cleaner look in the PNG
-      const padding = 40;
-      canvas.width = img.width + padding;
-      canvas.height = img.height + padding;
-      
-      if (ctx) {
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, padding / 2, padding / 2);
-      }
-      
+      canvas.width = 1000;
+      canvas.height = 1000;
+      ctx?.drawImage(img, 0, 0, 1000, 1000);
       const pngFile = canvas.toDataURL("image/png");
       const downloadLink = document.createElement("a");
-      downloadLink.download = `${username}-nfc-qr.png`;
+      downloadLink.download = `${username}_qr.png`;
       downloadLink.href = pngFile;
       downloadLink.click();
     };
-
     img.src = "data:image/svg+xml;base64," + btoa(svgData);
   };
 
   return (
-    <section className={cn("container py-12", themeClasses[theme])}>
+    <section className={cn(
+      "py-20 flex flex-col items-center transition-colors duration-500", 
+      theme.bg
+    )}>
+      {/* Section Title */}
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="text-center mb-8"
+        className="text-center mb-12"
       >
-        <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-[var(--qr-bg)] text-[var(--qr-primary)] mb-3">
-          <QrCode className="h-6 w-6" />
+        <div className="flex items-center justify-center gap-2 mb-2">
+            <QrCode className={cn("w-4 h-4", theme.primary)} />
+            <h2 className={cn("text-[10px] font-black uppercase tracking-[0.3em] opacity-50", theme.text)}>
+            Scan & Connect
+            </h2>
         </div>
-        <h2 className="text-2xl font-black italic tracking-tighter uppercase text-slate-900">
-          Share Your <span className="text-[var(--qr-primary)]">Profile</span>
+        <h2 className={cn("text-2xl font-black italic uppercase tracking-tighter", theme.text)}>
+          Digital QR Card
         </h2>
+        <div className={cn("w-12 h-1.5 mx-auto mt-3 rounded-full", theme.accent)} />
       </motion.div>
 
-      <Card className="mx-auto max-w-sm border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white">
-        <CardContent className="flex flex-col items-center gap-6 p-8">
-          
-          {/* QR Code Container */}
-          <motion.div 
-            whileHover={{ scale: 1.02 }}
-            className="relative p-4 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200"
+      {/* QR Card Container */}
+      <div className="relative group">
+        {/* Glow Effect - Adapts to Theme Accent */}
+        <div className={cn(
+          "absolute -inset-6 rounded-[3rem] blur-2xl opacity-10 group-hover:opacity-20 transition-opacity duration-700",
+          theme.accent
+        )} />
+        
+        <motion.div 
+          initial={{ scale: 0.9, opacity: 0 }}
+          whileInView={{ scale: 1, opacity: 1 }}
+          viewport={{ once: true }}
+          className={cn(
+            "relative p-10 shadow-2xl border-2 transition-all duration-700",
+            ui.layout === "minimal" ? "rounded-[2rem]" : "rounded-[3.5rem]",
+            theme.card,
+            theme.border
+          )}
+        >
+          {/* Action Badge */}
+          <button 
+            onClick={downloadQR}
+            className={cn(
+              "absolute -top-6 left-1/2 -translate-x-1/2 p-3 rounded-2xl shadow-xl transition-all hover:scale-110 active:scale-90 border-2 z-10",
+              theme.accent,
+              theme.accentContent || "text-white",
+              "border-transparent"
+            )}
           >
-            <div className="bg-white p-3 rounded-2xl shadow-inner">
-              <QRCodeSVG
-                value={profileUrl}
-                size={200}
-                level={"H"}
-                includeMargin={false}
-                ref={qrRef}
-                fgColor="currentColor"
-                className="text-slate-900"
-              />
-            </div>
-          </motion.div>
+            <Download className="w-5 h-5" strokeWidth={2.5} />
+          </button>
 
-          {/* URL Box */}
-          <div className="w-full space-y-2">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Profile URL</p>
-            <div className="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-100 group">
-              <p className="flex-1 text-[11px] font-bold text-slate-600 truncate pl-2 italic">
-                {profileUrl}
-              </p>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-8 w-8 rounded-lg hover:bg-[var(--qr-bg)] hover:text-[var(--qr-primary)]"
-                onClick={copyToClipboard}
-              >
-                {copied ? <Check className="h-4 w-4 text-green-500" /> : <LinkIcon className="h-4 w-4" />}
-              </Button>
-            </div>
+          <div className="bg-white p-4 rounded-[1.5rem] shadow-inner overflow-hidden flex items-center justify-center">
+            <QRCodeSVG
+              ref={qrRef}
+              value={profileUrl}
+              size={200}
+              level={"H"}
+              includeMargin={false}
+              // Dark themes get black QR modules, light themes get theme-colored modules
+              fgColor={theme.name === "Pure Dark" ? "#000000" : "#111827"}
+              imageSettings={profileImage ? {
+                src: profileImage,
+                x: undefined,
+                y: undefined,
+                height: 48,
+                width: 48,
+                excavate: true,
+              } : undefined}
+            />
           </div>
+        </motion.div>
+      </div>
 
-          {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-3 w-full">
-            <Button 
-              className="bg-slate-900 hover:bg-black text-white rounded-xl font-bold text-xs uppercase tracking-widest h-11 gap-2 shadow-lg"
-              onClick={downloadQR}
-            >
-              <Download className="h-4 w-4" /> PNG
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              className="border-slate-200 hover:border-[var(--qr-primary)] hover:text-[var(--qr-primary)] rounded-xl font-bold text-xs uppercase tracking-widest h-11 gap-2"
-              onClick={() => window.print()}
-            >
-              <FileType className="h-4 w-4" /> Print
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Branding / Footer Text */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+        className="mt-10 text-center space-y-2"
+      >
+        <p className={cn(
+          "text-[10px] font-black uppercase tracking-[0.4em] opacity-30",
+          theme.text
+        )}>
+          Point camera to save
+        </p>
+        <p className={cn("text-[9px] font-bold opacity-20", theme.text)}>
+          {profileUrl.replace('https://', '')}
+        </p>
+      </motion.div>
     </section>
   );
 };

@@ -1,52 +1,20 @@
 import { useState } from "react";
 import { 
-  MessageSquare, Phone, Globe, Share2, 
-  Instagram, Facebook, Linkedin, Youtube, Twitter, Link,
-  UserPlus, ArrowLeftRight, MoreHorizontal, Copy, Check,
-  MapPin // Added MapPin icon
+  MessageSquare, Phone, Share2, UserPlus, MapPin, X, Plus 
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { 
-  Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger 
-} from "@/components/ui/drawer";
-import api from "@/api/api";
-import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import api from "@/api/api";
 
-interface BottomContactBarProps {
+interface FloatingMenuProps {
   profile: any;
+  theme: any; 
+  ui: any;    
 }
 
-const getSocialIcon = (platform: string) => {
-  switch (platform.toLowerCase()) {
-    case 'instagram': return <Instagram className="h-5 w-5" />;
-    case 'facebook': return <Facebook className="h-5 w-5" />;
-    case 'linkedin': return <Linkedin className="h-5 w-5" />;
-    case 'youtube': return <Youtube className="h-5 w-5" />;
-    case 'twitter': return <Twitter className="h-5 w-5" />;
-    default: return <Link className="h-5 w-5" />;
-  }
-};
-
-const BottomContactBar = ({ profile }: BottomContactBarProps) => {
-  const [isShareOpen, setIsShareOpen] = useState(false);
-
-  // Safety Check & Action Handler for Google Maps
-  const handleMapAction = async () => {
-    const mapUrl = profile.google_map_link;
-
-    if (!mapUrl || mapUrl.trim() === "") {
-      toast.error("No location provided");
-      return;
-    }
-
-    // Basic URL validation
-    if (!mapUrl.includes("google.com/maps") && !mapUrl.includes("goo.gl/maps")) {
-       console.warn("Link might not be a standard Google Maps link, but attempting to open anyway.");
-    }
-
-    handleAction(mapUrl, 'directions');
-  };
+const FloatingContactMenu = ({ profile, theme, ui }: FloatingMenuProps) => {
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleAction = async (url: string, type?: string) => {
     try {
@@ -64,155 +32,134 @@ const BottomContactBar = ({ profile }: BottomContactBarProps) => {
   };
 
   const downloadVCard = () => {
-    const vcard = `BEGIN:VCARD
-VERSION:3.0
-FN:${profile.user?.full_name || 'NFC User'}
-TEL;TYPE=CELL:${profile.phone || ''}
-EMAIL:${profile.user?.email || ''}
-URL:${window.location.href}
-END:VCARD`;
-
+    const vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${profile.user?.full_name || 'Contact'}\nTEL;TYPE=CELL:${profile.phone || ''}\nEND:VCARD`;
     const blob = new Blob([vcard], { type: "text/vcard" });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `${profile.username || 'contact'}.vcf`);
-    document.body.appendChild(link);
+    link.setAttribute("download", `contact.vcf`);
     link.click();
-    document.body.removeChild(link);
-    toast.success("Contact file ready!");
+    toast.success("Contact ready to save!");
   };
 
   return (
-    <section className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-t border-slate-100 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] pb-safe">
-      <div className="max-w-md mx-auto p-4 space-y-3">
-        
-        {/* TOP ROW: High Conversion Actions */}
-        <div className="grid grid-cols-2 gap-3">
-          <Button 
-            onClick={downloadVCard}
-            className="bg-slate-900 hover:bg-black text-white rounded-2xl h-12 font-black uppercase tracking-tighter italic text-xs gap-2"
+    <div className="fixed bottom-10 right-6 z-[100] flex flex-col items-end gap-3">
+      {/* Expanded Menu Options */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.8 }}
+            className="flex flex-col items-end gap-4 mb-4"
           >
-            <UserPlus className="h-4 w-4 text-orange-500" />
-            Add Contact
-          </Button>
+            <ActionButton 
+                label="Save Contact" 
+                icon={<UserPlus className="h-5 w-5" />} 
+                onClick={downloadVCard} 
+                theme={theme}
+                isPrimary
+            />
 
-          <Button 
-            onClick={() => document.getElementById('enquiry-section')?.scrollIntoView({ behavior: 'smooth' })}
-            variant="outline"
-            className="border-2 border-slate-900 rounded-2xl h-12 font-black uppercase tracking-tighter italic text-xs gap-2"
-          >
-            <ArrowLeftRight className="h-4 w-4" />
-            Exchange
-          </Button>
-        </div>
+            <ActionButton 
+                label="WhatsApp" 
+                icon={<MessageSquare className="h-5 w-5" />} 
+                onClick={() => handleAction(`https://wa.me/${profile.whatsapp}`, 'whatsapp')} 
+                theme={theme}
+            />
 
-        {/* BOTTOM ROW: Quick Icons */}
-        <div className="flex items-center justify-between px-2">
-          {/* WhatsApp */}
-          <button 
-            onClick={() => handleAction(`https://wa.me/${profile.whatsapp}`, 'whatsapp')}
-            className="flex flex-col items-center gap-1 group"
-          >
-            <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-green-50 transition-colors">
-              <MessageSquare className="h-5 w-5 text-slate-600 group-hover:text-green-600" />
-            </div>
-          </button>
+            <ActionButton 
+                label="Call Now" 
+                icon={<Phone className="h-5 w-5" />} 
+                onClick={() => handleAction(`tel:${profile.phone}`, 'call')} 
+                theme={theme}
+            />
 
-          {/* Call */}
-          <button 
-            onClick={() => handleAction(`tel:${profile.phone}`, 'call')}
-            className="flex flex-col items-center gap-1 group"
-          >
-            <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-blue-50 transition-colors">
-              <Phone className="h-5 w-5 text-slate-600 group-hover:text-blue-600" />
-            </div>
-          </button>
+            {profile.google_map_link && (
+                <ActionButton 
+                    label="Location" 
+                    icon={<MapPin className="h-5 w-5" />} 
+                    onClick={() => handleAction(profile.google_map_link, 'location')} 
+                    theme={theme}
+                />
+            )}
 
-          {/* NEW: Google Maps Icon */}
-          {profile.google_map_link && (
-            <button 
-              onClick={handleMapAction}
-              className="flex flex-col items-center gap-1 group"
-            >
-              <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-red-50 transition-colors">
-                <MapPin className="h-5 w-5 text-slate-600 group-hover:text-red-600" />
-              </div>
-            </button>
-          )}
-
-          {/* Social Drawer */}
-          <Drawer>
-            <DrawerTrigger asChild>
-              <button className="flex flex-col items-center gap-1 group">
-                <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-orange-50 transition-colors">
-                  <MoreHorizontal className="h-5 w-5 text-slate-600 group-hover:text-orange-600" />
-                </div>
-              </button>
-            </DrawerTrigger>
-            <DrawerContent className="max-w-md mx-auto rounded-t-[3rem]">
-              <DrawerHeader>
-                <DrawerTitle className="text-center font-black italic uppercase tracking-tighter">Social Links</DrawerTitle>
-              </DrawerHeader>
-              <div className="grid grid-cols-4 gap-6 p-8">
-                {profile.sociallinks?.map((link: any) => (
-                  <button 
-                    key={link.id} 
-                    onClick={() => handleAction(link.url, link.platform)}
-                    className="flex flex-col items-center gap-2"
-                  >
-                    <div className="h-14 w-14 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100">
-                      {getSocialIcon(link.platform)}
-                    </div>
-                    <span className="text-[10px] font-bold uppercase">{link.platform}</span>
-                  </button>
-                ))}
-              </div>
-            </DrawerContent>
-          </Drawer>
-
-          {/* Easy Share Trigger */}
-          <button 
-            onClick={() => setIsShareOpen(true)}
-            className="flex flex-col items-center gap-1 group"
-          >
-            <div className="h-10 w-10 rounded-full bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-200">
-              <Share2 className="h-5 w-5 text-white" />
-            </div>
-          </button>
-        </div>
-      </div>
-
-      {/* EASY SHARE MODAL (Native + Copy) */}
-      <Drawer open={isShareOpen} onOpenChange={setIsShareOpen}>
-        <DrawerContent className="max-w-md mx-auto rounded-t-[3rem] p-6 pb-12">
-           <DrawerHeader>
-              <DrawerTitle className="text-2xl font-black italic uppercase tracking-tighter">Spread the word</DrawerTitle>
-           </DrawerHeader>
-           <div className="space-y-6">
-              <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                 <div className="flex-1 truncate text-sm font-medium text-slate-500">{window.location.href}</div>
-                 <Button size="sm" variant="ghost" onClick={() => {
-                   navigator.clipboard.writeText(window.location.href);
-                   toast.success("Link copied!");
-                 }}>
-                   <Copy className="h-4 w-4" />
-                 </Button>
-              </div>
-              <Button 
-                className="w-full h-14 rounded-2xl bg-orange-500 hover:bg-orange-600 font-black uppercase italic"
+            <ActionButton 
+                label="Share Link" 
+                icon={<Share2 className="h-5 w-5" />} 
                 onClick={() => {
-                  navigator.share({ title: profile.user?.full_name, url: window.location.href });
-                  setIsShareOpen(false);
-                }}
-              >
-                Open Native Share
-              </Button>
-           </div>
-        </DrawerContent>
-      </Drawer>
-    </section>
+                    navigator.clipboard.writeText(window.location.href);
+                    toast.success("Link copied!");
+                }} 
+                theme={theme}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Toggle FAB */}
+      <motion.button 
+        whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.05 }}
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "h-16 w-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 border-4 border-white/10",
+          // Fix: Main button becomes neutral when open to focus on options, 
+          // but uses accentContent when closed for visibility.
+          isOpen 
+            ? "bg-zinc-800 text-white" 
+            : `${theme.accent} ${theme.accentContent || 'text-white'}`
+        )}
+      >
+        {isOpen ? (
+          <X className="h-7 w-7" />
+        ) : (
+          <Plus className="h-8 w-8" />
+        )}
+      </motion.button>
+
+      {/* Backdrop - respect theme background feel */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/40 backdrop-blur-md -z-10" 
+              onClick={() => setIsOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
-export default BottomContactBar;
+// Internal Sub-component - Fully Theme Aware
+const ActionButton = ({ label, icon, onClick, theme, isPrimary }: any) => (
+    <motion.div 
+      className="flex items-center gap-4 group cursor-pointer" 
+      onClick={onClick}
+      whileHover={{ x: -5 }}
+    >
+        <span className={cn(
+          "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-2xl border backdrop-blur-md",
+          theme.card,
+          theme.text,
+          theme.border,
+          "bg-opacity-90"
+        )}>
+            {label}
+        </span>
+        <div className={cn(
+            "h-14 w-14 rounded-full flex items-center justify-center shadow-2xl transition-all border-2 border-white/5", 
+            // Fix: Use accentContent for icons when button is Primary
+            isPrimary 
+                ? `${theme.accent} ${theme.accentContent || 'text-white'}` 
+                : "bg-zinc-800 text-zinc-100"
+        )}>
+            {icon}
+        </div>
+    </motion.div>
+);
+
+export default FloatingContactMenu;

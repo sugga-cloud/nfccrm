@@ -11,7 +11,7 @@ import MediaTab from "@/components/dashboard/tabs/MediaTab";
 import QRTab from "@/components/dashboard/tabs/QRTab";
 import BusinessHoursTab from "@/components/dashboard/tabs/BusinessHoursTab";
 import SocialLinksTab from "@/components/dashboard/tabs/SocialLinksTab";
-
+import AdminThemeSelector from "@/components/dashboard/tabs/LayoutTab";
 const sidebarItems = [
   { label: "Analytics", value: "analytics" },
   { label: "Edit Profile", value: "profile" },
@@ -23,6 +23,7 @@ const sidebarItems = [
   { label: "Manage Blogs", value: "blogs" },
   { label: "View Enquiries", value: "enquiries" },
   { label: "View Appointments", value: "appointments" },
+  { label: "Layout and Theme", value: "theme" },
   { label: "Download QR", value: "qr" },
 ];
 
@@ -46,6 +47,7 @@ const Dashboard = () => {
       {tab === "blogs" && <CrudTable title="Blogs" endpoint="/blogs" />}
       {tab === "enquiries" && <EnquiriesTab />}
       {tab === "appointments" && <AppointmentsTab />}
+      {tab === "theme" && <AdminThemeSelector/>}
       {tab === "qr" && <QRTab />}
     </DashboardShell>
   );

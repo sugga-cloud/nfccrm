@@ -75,7 +75,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     // Remove all existing '@' symbols
     const cleanUsername = username.replace(/@/g, "");
     // Prepend a single '@'
-    const formattedUsername = `@${cleanUsername}`;
+    const formattedUsername = `${cleanUsername}`;
     // Update the formData with the cleaned version
     formData.set("username", formattedUsername);
   }
@@ -163,7 +163,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Username</label>
                 <div className={`flex items-center rounded-lg border border-slate-200 overflow-hidden ${isEditing ? 'ring-2 ring-orange-500' : 'bg-slate-50'}`}>
-                  <div className="bg-orange-500 text-white px-4 py-2 font-bold h-11 flex items-center">@</div>
+                  {/* <div className="bg-orange-500 text-white px-4 py-2 font-bold h-11 flex items-center">@</div> */}
                   <Input 
                     name="username" 
                     defaultValue={profile?.username?.replace(/@/g, "")} 
@@ -224,6 +224,10 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Google Maps</label>
                 <Input name="google_map_link" defaultValue={profile?.google_map_link} readOnly={!isEditing} className={`h-11 ${!isEditing ? 'bg-slate-50' : ''}`} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-700">Address</label>
+                <Input name="address" defaultValue={profile?.address} readOnly={!isEditing} className={`h-11 ${!isEditing ? 'bg-slate-50' : ''}`} />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Website</label>

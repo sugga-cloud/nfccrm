@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Image as ImageIcon, Maximize2, X } from "lucide-react";
+import { PlayCircle, X } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
@@ -13,133 +13,153 @@ interface GalleryItem {
 
 interface GallerySectionProps {
   gallery: GalleryItem[] | null;
-  theme?: "orange" | "blue" | "purple" | "emerald" | "rose";
+  theme: any; 
+  ui: any;    
 }
 
-const GallerySection = ({ gallery, theme = "orange" }: GallerySectionProps) => {
+const GallerySection = ({ gallery, theme, ui }: GallerySectionProps) => {
   const [selected, setSelected] = useState<GalleryItem | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   if (!gallery || gallery.length === 0) return null;
 
-  const themeClasses = {
-    orange: "[--gal-primary:#f97316] [--gal-bg:theme(colors.orange.50)]",
-    blue: "[--gal-primary:#3b82f6] [--gal-bg:theme(colors.blue.50)]",
-    purple: "[--gal-primary:#a855f7] [--gal-bg:theme(colors.purple.50)]",
-    emerald: "[--gal-primary:#10b981] [--gal-bg:theme(colors.emerald.50)]",
-    rose: "[--gal-primary:#f43f5e] [--gal-bg:theme(colors.rose.50)]",
-  };
+  const isGridLayout = ui.layout === "grid";
 
   return (
-    <section className={cn("container py-16 px-4 md:px-6", themeClasses[theme])}>
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        className="flex flex-col items-center mb-10"
-      >
-        <div className="flex items-center gap-2 mb-2">
-           <ImageIcon className="h-4 w-4 text-[var(--gal-primary)]" />
-           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Visuals</p>
-        </div>
-        <h2 className="text-3xl font-black italic tracking-tighter uppercase text-slate-900">
-          Media <span className="text-[var(--gal-primary)]">Gallery</span>
-        </h2>
-      </motion.div>
+    <section className={cn("w-full py-20 overflow-hidden transition-colors duration-500", theme.bg)}>
+      <div className="container mx-auto px-4">
+        
+        {/* Section Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className={cn(
+            "flex flex-col mb-10",
+            ui.layout === "minimal" ? "items-start" : "items-center text-center"
+          )}
+        >
+          <h2 className={cn("text-2xl font-black italic uppercase tracking-tighter", theme.text)}>
+            Media Gallery
+          </h2>
+          <div className={cn("w-12 h-1.5 mt-2 rounded-full", theme.accent)} />
+        </motion.div>
 
-      {/* Bento Mosaic Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[200px] md:auto-rows-[250px]">
-        {gallery.map((item, index) => {
-          // Bento Logic: 1st and 6th items are "Big"
-          const isLarge = index === 0 || index === 5;
-          
-          return (
+        {/* Dynamic Layout: Grid or Horizontal Slider */}
+        <div 
+          ref={scrollRef}
+          className={cn(
+            "scrollbar-hide pb-8 transition-all duration-500",
+            isGridLayout 
+              ? "grid grid-cols-2 md:grid-cols-3 gap-4" 
+              : "flex overflow-x-auto gap-5 snap-x snap-mandatory"
+          )}
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {gallery.map((item, index) => (
             <motion.button
               key={item.id}
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
               transition={{ delay: index * 0.05 }}
               onClick={() => setSelected(item)}
               className={cn(
-                "group relative overflow-hidden rounded-[2rem] border-none shadow-lg bg-slate-100",
-                isLarge ? "col-span-2 row-span-2" : "col-span-1 row-span-1"
+                "relative overflow-hidden border shadow-xl group transition-all duration-500 aspect-[4/5] outline-none",
+                theme.card,
+                theme.border,
+                ui.layout === "minimal" ? "rounded-2xl" : "rounded-[2.5rem]",
+                isGridLayout 
+                  ? "w-full" 
+                  : "flex-none w-[75vw] sm:w-[300px] snap-center"
               )}
             >
-              {/* Image Layer */}
               <img
                 src={item.media_url}
                 alt={item.title}
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110"
                 onError={(e) => (e.currentTarget.src = "/placeholder.svg")}
               />
 
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-3">
-                <div className="bg-white/20 backdrop-blur-md p-3 rounded-2xl scale-75 group-hover:scale-100 transition-transform duration-300">
-                  {item.type === "video" ? (
-                    <Play className="h-6 w-6 fill-white text-white" />
-                  ) : (
-                    <Maximize2 className="h-6 w-6 text-white" />
-                  )}
+              {/* Video Indicator - Themed Glassmorphism */}
+              {item.type === "video" && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[2px] group-hover:bg-black/40 transition-colors">
+                  <div className={cn(
+                    "p-4 rounded-full shadow-2xl transition-transform group-hover:scale-110",
+                    theme.accent,
+                    theme.accentContent || "text-white"
+                  )}>
+                    <PlayCircle className="h-8 w-8 fill-current" />
+                  </div>
                 </div>
-                <p className="text-white text-[10px] font-bold uppercase tracking-widest px-4 text-center">
+              )}
+
+              {/* Gradient Overlay for Title */}
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-5 pt-12 text-left translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                <p className="text-white text-[10px] font-black uppercase tracking-[0.2em] opacity-80 group-hover:opacity-100">
                   {item.title}
                 </p>
               </div>
-
-              {/* Static Video Indicator */}
-              {item.type === "video" && (
-                <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md p-1.5 rounded-lg group-hover:opacity-0 transition-opacity">
-                  <Play className="h-3 w-3 fill-white text-white" />
-                </div>
-              )}
             </motion.button>
-          );
-        })}
+          ))}
+        </div>
       </div>
 
-      {/* Lightbox Dialog */}
+      {/* Lightbox / Preview Dialog */}
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="max-w-4xl p-0 bg-black/90 border-none shadow-none backdrop-blur-xl overflow-hidden rounded-[2.5rem]">
-          <AnimatePresence>
+        <DialogContent className={cn(
+          "max-w-[95vw] sm:max-w-4xl p-0 border-none overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] transition-all bg-transparent",
+          ui.layout === "minimal" ? "rounded-3xl" : "rounded-[3.5rem]"
+        )}>
+          <AnimatePresence mode="wait">
             {selected && (
               <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.9 }} 
                 animate={{ opacity: 1, scale: 1 }}
-                className="relative flex flex-col items-center"
+                exit={{ opacity: 0, scale: 0.9 }}
+                className={cn("relative overflow-hidden", theme.card, theme.border, "border-2")}
               >
-                {/* Close Button Inside for UX */}
+                {/* Close Button - Themed Visibility */}
                 <button 
-                   onClick={() => setSelected(null)}
-                   className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                  onClick={() => setSelected(null)}
+                  className={cn(
+                    "absolute top-6 right-6 z-50 p-3 rounded-full backdrop-blur-xl shadow-2xl transition-all hover:rotate-90 active:scale-90",
+                    theme.accent, 
+                    theme.accentContent || "text-white"
+                  )}
                 >
-                    <X className="h-5 w-5 text-white" />
+                  <X className="h-5 w-5" />
                 </button>
 
-                <div className="w-full relative">
+                <div className="w-full bg-black/20">
                   {selected.type === "video" ? (
-                    <div className="aspect-video w-full bg-black flex items-center">
+                    <div className="aspect-video w-full flex items-center justify-center">
                       <video 
                         src={selected.media_url} 
                         controls 
                         autoPlay 
-                        className="w-full h-full max-h-[70vh]"
+                        className="w-full h-full max-h-[80vh]" 
                       />
                     </div>
                   ) : (
-                    <img
-                      src={selected.media_url}
-                      alt={selected.title}
-                      className="w-full h-auto max-h-[75vh] object-contain"
-                    />
+                    <div className="flex items-center justify-center p-2">
+                      <img
+                        src={selected.media_url}
+                        alt={selected.title}
+                        className="w-full h-auto max-h-[75vh] object-contain rounded-lg"
+                      />
+                    </div>
                   )}
                 </div>
 
-                <div className="w-full p-6 bg-white/5 border-t border-white/10 text-center">
-                   <h3 className="text-white font-black italic uppercase tracking-tighter text-lg">
-                     {selected.title}
-                   </h3>
-                   <div className="inline-block mt-2 px-3 py-1 rounded-full bg-[var(--gal-primary)] text-[10px] font-black uppercase tracking-widest text-white">
-                      {selected.type}
-                   </div>
+                <div className="p-8 text-center border-t border-white/5">
+                  <h3 className={cn("font-black text-xl italic uppercase tracking-tight", theme.text)}>
+                    {selected.title}
+                  </h3>
+                  <div className={cn("w-12 h-1 mx-auto mt-3 rounded-full opacity-50", theme.accent)} />
+                  <p className={cn("text-[10px] font-black uppercase mt-4 tracking-[0.4em] opacity-30", theme.text)}>
+                    Premium {selected.type} Experience
+                  </p>
                 </div>
               </motion.div>
             )}

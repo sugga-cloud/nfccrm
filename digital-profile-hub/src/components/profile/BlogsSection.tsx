@@ -1,32 +1,41 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogDescription,
-  DialogClose
-} from "@/components/ui/dialog";
-import { X } from "lucide-react"; // For a clean close button
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { X, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface BlogItem {
   id: number;
   title: string;
   excerpt: string;
-  content: string;
+  description?: string;
   featured_image: string;
   created_at: string;
 }
 
 interface BlogsSectionProps {
   blogs: BlogItem[] | null;
+  theme: any; 
+  ui: any;    
 }
 
-const BlogsSection = ({ blogs }: BlogsSectionProps) => {
+const BlogsSection = ({ blogs, theme, ui }: BlogsSectionProps) => {
   const [selected, setSelected] = useState<BlogItem | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   if (!blogs || blogs.length === 0) return null;
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const { scrollLeft, clientWidth } = scrollRef.current;
+      const scrollAmount = clientWidth * 0.8;
+      const scrollTo = direction === "left" 
+        ? scrollLeft - scrollAmount 
+        : scrollLeft + scrollAmount;
+      scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-IN', {
@@ -37,94 +46,191 @@ const BlogsSection = ({ blogs }: BlogsSectionProps) => {
   };
 
   return (
-    <section className="container py-8">
-      <h2 className="mb-8 text-center text-3xl font-black italic uppercase tracking-tighter text-slate-900">
-        Latest <span className="text-orange-500">Insights</span>
-      </h2>
+    <section className={cn("w-full py-16 transition-colors duration-500", theme.bg)}>
+      <div className="container mx-auto px-4">
+        
+        {/* Section Header with Navigators */}
+        <div className={cn(
+          "flex justify-between items-end mb-10",
+          ui.layout === "minimal" ? "flex-col items-start gap-4" : ""
+        )}>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 mb-1">
+               <BookOpen className={cn("h-4 w-4", theme.primary)} />
+               <span className={cn("text-[10px] font-bold uppercase tracking-[0.2em] opacity-50", theme.text)}>
+                 Insights
+               </span>
+            </div>
+            <h2 className={cn("text-2xl font-black italic uppercase tracking-tighter", theme.text)}>Latest Blogs</h2>
+            <div className={cn("w-12 h-1 mt-2 rounded-full", theme.accent)} />
+          </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {blogs.map((blog) => (
-          <Card 
-            key={blog.id} 
-            className="group cursor-pointer overflow-hidden rounded-[2rem] border-slate-100 transition-all hover:shadow-2xl hover:-translate-y-1" 
-            onClick={() => setSelected(blog)}
-          >
-            <CardContent className="p-0 flex flex-col h-full">
-              <div className="overflow-hidden">
-                <img 
-                  src={blog.featured_image || "/placeholder.svg"} 
-                  alt={blog.title} 
-                  className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-              </div>
-              <div className="p-6 flex flex-col flex-1">
-                <p className="text-[10px] font-black uppercase tracking-widest text-orange-500">
-                  {formatDate(blog.created_at)}
-                </p>
-                <h3 className="mt-2 text-xl font-bold leading-tight text-slate-900 line-clamp-2 italic uppercase">
-                  {blog.title}
-                </h3>
-                <p className="mt-3 text-sm font-medium text-slate-500 line-clamp-3">
-                  {blog.excerpt}
-                </p>
-                <div className="mt-auto pt-4">
-                  <span className="text-xs font-black uppercase tracking-widest text-slate-900 group-hover:text-orange-500 transition-colors">
-                    Read Story →
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+          <div className="flex gap-3">
+            <button 
+              onClick={() => scroll("left")} 
+              className={cn(
+                "p-3 rounded-full border transition-all active:scale-90 shadow-sm", 
+                theme.border, 
+                theme.card, 
+                "hover:brightness-110"
+              )}
+            >
+              <ChevronLeft className={cn("h-5 w-5", theme.text)} />
+            </button>
+            <button 
+              onClick={() => scroll("right")} 
+              className={cn(
+                "p-3 rounded-full border transition-all active:scale-90 shadow-sm", 
+                theme.border, 
+                theme.card, 
+                "hover:brightness-110"
+              )}
+            >
+              <ChevronRight className={cn("h-5 w-5", theme.text)} />
+            </button>
+          </div>
+        </div>
+
+        {/* Dynamic Slider */}
+        <div 
+          ref={scrollRef}
+          className="flex overflow-x-auto gap-6 snap-x snap-mandatory scrollbar-hide pb-8 px-2"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {blogs.map((blog, index) => (
+            <motion.div
+              key={blog.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              onClick={() => setSelected(blog)}
+              className={cn(
+                "relative flex-none snap-start cursor-pointer group",
+                "w-[85%] md:w-[calc((100%-4rem)/3)]"
+              )}
+            >
+              <Card className={cn(
+                "h-full border shadow-md overflow-hidden transition-all duration-500 group-hover:shadow-2xl group-hover:-translate-y-2",
+                theme.card,
+                theme.border,
+                ui.layout === "minimal" ? "rounded-2xl" : "rounded-[2rem]"
+              )}>
+                <CardContent className="p-0 flex flex-col h-full">
+                  <div className="aspect-[16/11] w-full overflow-hidden relative">
+                    <img 
+                      src={blog.featured_image || "/placeholder.svg"} 
+                      alt={blog.title} 
+                      className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <div className="p-6 flex flex-col flex-1">
+                    <span className={cn("text-[10px] font-black uppercase tracking-widest opacity-40", theme.text)}>
+                      {formatDate(blog.created_at)}
+                    </span>
+                    <h3 className={cn("mt-2 text-lg font-bold line-clamp-2 leading-tight", theme.text)}>
+                      {blog.title}
+                    </h3>
+                    <div className={cn(
+                      "mt-auto pt-6 flex items-center text-[10px] font-black uppercase tracking-widest transition-all", 
+                      theme.primary,
+                      "group-hover:translate-x-1"
+                    )}>
+                      Read Full Article <ChevronRight className="ml-2 h-4 w-4" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
       </div>
 
-      {/* FULL WIDTH / FULL HEIGHT DIALOG */}
+      {/* Full-Screen Article View */}
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent 
-          className="z-[100] max-w-none w-screen h-screen m-0 rounded-none p-0 overflow-y-auto border-none flex flex-col"
-          hideCloseButton // Some Shadcn versions allow hiding the default small X
-        >
+        <DialogContent className={cn(
+          "max-w-none w-screen h-screen m-0 rounded-none p-0 overflow-y-auto border-none flex flex-col transition-colors duration-500 z-[999]",
+          theme.bg
+        )}>
           {selected && (
-            <div className="flex flex-col w-full h-full bg-white">
-              {/* Custom Header Navigation */}
-              <div className="sticky top-0 z-50 flex items-center justify-between bg-white/80 backdrop-blur-md px-6 py-4 border-b border-slate-100">
-                <div className="flex flex-col">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">Article</p>
-                  <p className="text-xs font-bold text-slate-400">{formatDate(selected.created_at)}</p>
+            <div className="flex flex-col w-full min-h-full">
+              {/* Top Navigation Bar */}
+              <div className={cn(
+                "sticky top-0 z-[1000] flex items-center justify-between backdrop-blur-xl px-6 py-4 border-b transition-all",
+                theme.border,
+                "bg-opacity-70",
+                theme.bg
+              )}>
+                <div className="flex items-center gap-4">
+                  <button 
+                    onClick={() => setSelected(null)} 
+                    className={cn(
+                        "p-2 rounded-full transition-all active:scale-90", 
+                        theme.card, 
+                        theme.border, 
+                        "border"
+                    )}
+                  >
+                    <ChevronLeft className={cn("h-5 w-5", theme.text)} />
+                  </button>
+                  <span className={cn("text-[10px] font-black uppercase tracking-[0.2em] opacity-40 hidden sm:block", theme.text)}>
+                    Back to Profile
+                  </span>
                 </div>
                 <button 
-                  onClick={() => setSelected(null)}
-                  className="p-2 rounded-full hover:bg-slate-100 transition-colors"
+                    onClick={() => setSelected(null)} 
+                    className={cn(
+                        "p-2 rounded-full transition-all active:scale-90", 
+                        theme.accent, 
+                        theme.accentContent // Fix for Pure Dark close button
+                    )}
                 >
-                  <X className="h-6 w-6 text-slate-900" />
+                  <X className="h-5 w-5" />
                 </button>
               </div>
 
-              {/* Main Content Area */}
-              <article className="flex-1 w-full max-w-4xl mx-auto px-6 py-12">
-                <header className="mb-10 text-center">
-                  <h1 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter text-slate-900 leading-[0.9]">
+              {/* Blog Content */}
+              <motion.article 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="max-w-4xl mx-auto px-6 py-12 w-full"
+              >
+                <header className="mb-10">
+                  <span className={cn("text-xs font-black uppercase tracking-[0.3em]", theme.primary)}>
+                    {formatDate(selected.created_at)}
+                  </span>
+                  <h1 className={cn("mt-4 text-4xl md:text-6xl font-black leading-[1.1] tracking-tighter", theme.text)}>
                     {selected.title}
                   </h1>
+                  <div className={cn("w-20 h-2 mt-8 rounded-full", theme.accent)} />
                 </header>
 
-                <div className="mb-12">
-                  <img 
-                    src={selected.featured_image || "/placeholder.svg"} 
-                    alt={selected.title} 
-                    className="w-full aspect-video rounded-[3rem] object-cover shadow-2xl" 
-                  />
+                <div className="relative mb-12 group">
+                    <img 
+                      src={selected.featured_image || "/placeholder.svg"} 
+                      alt={selected.title} 
+                      className={cn(
+                        "w-full aspect-video object-cover shadow-2xl transition-transform duration-700",
+                        ui.layout === "minimal" ? "rounded-2xl" : "rounded-[3rem]"
+                      )} 
+                    />
+                    <div className={cn("absolute -bottom-6 -right-6 h-32 w-32 rounded-full opacity-20 blur-3xl", theme.accent)} />
                 </div>
 
-                {/* Content with proper wrapping and spacing */}
-                <div className="prose prose-slate max-w-none">
-                  <p className="text-lg md:text-xl leading-relaxed text-slate-700 font-medium whitespace-pre-wrap break-words">
+                <div className="max-w-none">
+                  <div className={cn(
+                    "text-lg md:text-xl leading-relaxed whitespace-pre-wrap opacity-80 font-medium", 
+                    theme.text
+                  )}>
                     {selected.description || selected.excerpt} 
-                  </p>
+                  </div>
                 </div>
                 
-                <div className="h-20" /> {/* Extra spacing at bottom */}
-              </article>
+                <div className="h-32 border-t mt-20 flex items-center justify-center opacity-20" style={{ borderColor: 'currentColor' }}>
+                    <BookOpen className={cn("h-8 w-8", theme.text)} />
+                </div>
+              </motion.article>
             </div>
           )}
         </DialogContent>

@@ -10,10 +10,11 @@ import { cn } from "@/lib/utils";
 
 interface EnquiryFormProps {
   profileId: number;
-  theme?: "orange" | "blue" | "purple" | "emerald" | "rose";
+  theme: any; 
+  ui: any;    
 }
 
-const EnquiryForm = ({ profileId, theme = "orange" }: EnquiryFormProps) => {
+const EnquiryForm = ({ profileId, theme, ui }: EnquiryFormProps) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -21,14 +22,6 @@ const EnquiryForm = ({ profileId, theme = "orange" }: EnquiryFormProps) => {
     email: "",
     message: "",
   });
-
-  const themeClasses = {
-    orange: "[--form-primary:#f97316] [--form-bg:theme(colors.orange.50)]",
-    blue: "[--form-primary:#3b82f6] [--form-bg:theme(colors.blue.50)]",
-    purple: "[--form-primary:#a855f7] [--form-bg:theme(colors.purple.50)]",
-    emerald: "[--form-primary:#10b981] [--form-bg:theme(colors.emerald.50)]",
-    rose: "[--form-primary:#f43f5e] [--form-bg:theme(colors.rose.50)]",
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,112 +39,134 @@ const EnquiryForm = ({ profileId, theme = "orange" }: EnquiryFormProps) => {
       toast.success("Enquiry sent successfully!");
       setFormData({ name: "", phone: "", email: "", message: "" });
     } catch (error: any) {
-      console.log(error.response.data.message)
       toast.error(error.response?.data?.message || "Failed to send enquiry.");
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <section className={cn("container py-16 px-4", themeClasses[theme])}>
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="relative mx-auto max-w-2xl"
-      >
-        {/* Background Stack Decor */}
-        <div className="absolute inset-0 translate-x-4 translate-y-4 bg-[var(--form-primary)]/10 rounded-[3rem] -z-10" />
-        
-        <div className="bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100">
-          {/* Header */}
-          <div className="bg-slate-900 p-8 text-center text-white">
-            <div className="mx-auto bg-[var(--form-primary)] w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/20">
-              <MessageSquare className="text-white h-6 w-6" />
-            </div>
-            <h2 className="text-2xl font-black italic tracking-tighter uppercase">
-              Get In <span className="text-[var(--form-primary)]">Touch</span>
-            </h2>
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2">
-              Have questions? Send a message
-            </p>
-          </div>
+  // Improved Input styling for theme consistency
+  const inputClasses = cn(
+    "pl-11 h-12 transition-all font-medium text-sm border bg-opacity-50",
+    ui.layout === "minimal" ? "rounded-xl" : "rounded-2xl",
+    theme.card, 
+    theme.border, 
+    theme.text, 
+    "placeholder:opacity-30",
+    "focus:ring-2 focus:ring-offset-2 ring-offset-transparent outline-none",
+    // Logic to handle focus ring color safely
+    theme.name === "Pure Dark" ? "focus:ring-zinc-400" : "focus:ring-primary"
+  );
 
-          <form className="p-8 md:p-12 space-y-6" id="enquiry-section" onSubmit={handleSubmit}>
-            {/* Name Field */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-4 top-3 h-4 w-4 text-slate-400" />
+  return (
+    <section id="enquiry" className={cn("w-full py-20 transition-colors duration-500", theme.bg)}>
+      <div className="container mx-auto px-4">
+        
+        {/* Section Header */}
+        <div className={cn(
+          "flex flex-col mb-12",
+          ui.layout === "minimal" ? "items-start text-left" : "items-center text-center"
+        )}>
+          <div className="flex items-center gap-2 mb-2">
+             <MessageSquare className={cn("h-4 w-4", theme.primary)} />
+             <span className={cn("text-[10px] font-black uppercase tracking-[0.3em] opacity-50", theme.text)}>
+               Get In Touch
+             </span>
+          </div>
+          <h2 className={cn("text-3xl font-black italic uppercase tracking-tighter", theme.text)}>
+            Send an Enquiry
+          </h2>
+          <div className={cn("w-16 h-1.5 mt-3 rounded-full", theme.accent)} />
+        </div>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mx-auto max-w-2xl"
+        >
+          <div className={cn(
+            "relative border shadow-2xl overflow-hidden p-8 md:p-12 transition-all duration-500",
+            theme.card,
+            theme.border,
+            ui.layout === "minimal" ? "rounded-3xl" : "rounded-[3.5rem]"
+          )}>
+            {/* Decorative background glow */}
+            <div className={cn("absolute -top-24 -right-24 w-48 h-48 opacity-10 blur-3xl rounded-full", theme.accent)} />
+
+            <form className="space-y-6 relative z-10" onSubmit={handleSubmit}>
+              
+              {/* Name Field */}
+              <div className="relative group">
+                <User className={cn("absolute left-4 top-3.5 h-4 w-4 transition-opacity duration-300 opacity-30 group-focus-within:opacity-100", theme.text)} />
                 <Input 
-                  className="pl-11 h-12 rounded-2xl bg-slate-50 border-none focus-visible:ring-2 focus-visible:ring-[var(--form-primary)] font-medium"
-                  placeholder="John Doe" 
+                  className={inputClasses}
+                  placeholder="Your Name" 
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                 />
               </div>
-            </div>
 
-            {/* Contact Info Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone</label>
-                <div className="relative">
-                  <Phone className="absolute left-4 top-3 h-4 w-4 text-slate-400" />
+              {/* Grid for Phone and Email */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="relative group">
+                  <Phone className={cn("absolute left-4 top-3.5 h-4 w-4 transition-opacity duration-300 opacity-30 group-focus-within:opacity-100", theme.text)} />
                   <Input 
-                    className="pl-11 h-12 rounded-2xl bg-slate-50 border-none focus-visible:ring-2 focus-visible:ring-[var(--form-primary)] font-medium"
-                    placeholder="+1 234..." 
+                    className={inputClasses}
+                    placeholder="Mobile Number" 
                     type="tel" 
                     value={formData.phone}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
                   />
                 </div>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email</label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-3 h-4 w-4 text-slate-400" />
+                <div className="relative group">
+                  <Mail className={cn("absolute left-4 top-3.5 h-4 w-4 transition-opacity duration-300 opacity-30 group-focus-within:opacity-100", theme.text)} />
                   <Input 
-                    className="pl-11 h-12 rounded-2xl bg-slate-50 border-none focus-visible:ring-2 focus-visible:ring-[var(--form-primary)] font-medium"
-                    placeholder="john@example.com" 
+                    className={inputClasses}
+                    placeholder="Email Address" 
                     type="email" 
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                   />
                 </div>
               </div>
-            </div>
 
-            {/* Message Field */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Your Message</label>
-              <Textarea 
-                className="rounded-[2rem] bg-slate-50 border-none focus-visible:ring-2 focus-visible:ring-[var(--form-primary)] font-medium p-5"
-                placeholder="How can we help you?" 
-                rows={4} 
-                value={formData.message}
-                onChange={(e) => setFormData({...formData, message: e.target.value})}
-              />
-            </div>
+              {/* Message Field */}
+              <div className="relative group">
+                <Textarea 
+                  className={cn(
+                    inputClasses,
+                    "h-auto p-5 resize-none min-h-[140px] pl-5" // Removed icon padding for textarea for better UX
+                  )}
+                  placeholder="What's on your mind?..." 
+                  value={formData.message}
+                  onChange={(e) => setFormData({...formData, message: e.target.value})}
+                />
+              </div>
 
-            <Button 
-              className="w-full h-14 bg-slate-900 hover:bg-black text-white rounded-2xl font-black uppercase tracking-widest transition-all shadow-xl" 
-              type="submit" 
-              disabled={loading}
-            >
-              {loading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <>
-                  <Send className="mr-2 h-4 w-4 text-[var(--form-primary)]" />
-                  Submit Enquiry
-                </>
-              )}
-            </Button>
-          </form>
-        </div>
-      </motion.div>
+              <Button 
+                className={cn(
+                  "w-full h-14 font-black uppercase tracking-widest text-xs transition-all shadow-2xl group active:scale-95",
+                  theme.accent,
+                  theme.accentContent || "text-white", // Critical fix for Pure Dark
+                  ui.layout === "minimal" ? "rounded-xl" : "rounded-2xl"
+                )} 
+                type="submit" 
+                disabled={loading}
+              >
+                {loading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <span className="flex items-center gap-3">
+                    Submit Message
+                    <Send className="h-4 w-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                  </span>
+                )}
+              </Button>
+            </form>
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 };

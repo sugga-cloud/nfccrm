@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Clock, Calendar, ChevronRight } from "lucide-react";
+import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface BusinessHourRow {
@@ -11,21 +11,14 @@ interface BusinessHourRow {
 
 interface BusinessHoursProps {
   data: BusinessHourRow[] | null;
-  theme?: "orange" | "blue" | "purple" | "emerald" | "rose";
+  theme: any; 
+  ui: any;    
 }
 
 const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
 
-const BusinessHours = ({ data, theme = "orange" }: BusinessHoursProps) => {
+const BusinessHours = ({ data, theme, ui }: BusinessHoursProps) => {
   if (!data || data.length === 0) return null;
-
-  const themeClasses = {
-    orange: "[--hr-primary:#f97316] [--hr-bg:theme(colors.orange.50)]",
-    blue: "[--hr-primary:#3b82f6] [--hr-bg:theme(colors.blue.50)]",
-    purple: "[--hr-primary:#a855f7] [--hr-bg:theme(colors.purple.50)]",
-    emerald: "[--hr-primary:#10b981] [--hr-bg:theme(colors.emerald.50)]",
-    rose: "[--hr-primary:#f43f5e] [--hr-bg:theme(colors.rose.50)]",
-  };
 
   const formatTime = (time: string | null) => {
     if (!time) return "";
@@ -36,75 +29,130 @@ const BusinessHours = ({ data, theme = "orange" }: BusinessHoursProps) => {
     return `${formattedHours}:${minutes} ${ampm}`;
   };
 
+  const checkCurrentStatus = () => {
+    const now = new Date();
+    const currentTime = now.getHours() * 100 + now.getMinutes();
+    const todayData = data.find((d) => d.day === today);
+
+    if (!todayData || todayData.is_closed || !todayData.open_time || !todayData.close_time) return false;
+
+    const open = parseInt(todayData.open_time.replace(":", ""));
+    const close = parseInt(todayData.close_time.replace(":", ""));
+    return currentTime >= open && currentTime <= close;
+  };
+
+  const isOpenNow = checkCurrentStatus();
+
   return (
-    <section className={cn("w-full py-16 px-4 md:px-6", themeClasses[theme])}>
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        className="max-w-3xl mx-auto flex flex-col items-center mb-10"
-      >
-        <div className="flex items-center gap-2 mb-2">
-           <Clock className="h-4 w-4 text-[var(--hr-primary)]" />
-           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Availability</p>
-        </div>
-        <h2 className="text-3xl font-black italic tracking-tighter uppercase text-slate-900">
-          Business <span className="text-[var(--hr-primary)]">Hours</span>
-        </h2>
-      </motion.div>
+    <section className={cn("w-full py-16 transition-colors duration-500", theme.bg)}>
+      <div className="container mx-auto px-4">
+        
+        {/* Section Header - Layout Aware */}
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className={cn(
+            "flex flex-col mb-10",
+            ui.layout === "minimal" ? "items-start" : "items-center"
+          )}
+        >
+          <div className="flex items-center gap-2 mb-2">
+             <Clock className={cn("h-4 w-4", theme.primary)} />
+             <span className={cn("text-[10px] font-bold uppercase tracking-[0.3em] opacity-50", theme.text)}>
+               Schedule
+             </span>
+          </div>
+          <h2 className={cn("text-2xl font-black italic uppercase tracking-tighter", theme.text)}>
+            Business Hours
+          </h2>
+          <div className={cn("w-12 h-1 mt-2 rounded-full", theme.accent)} />
+        </motion.div>
 
-      <div className="max-w-3xl mx-auto space-y-3">
-        {data.map((row, index) => {
-          const isToday = row.day === today;
-          const isOpen = !row.is_closed;
+        {/* Schedule Card */}
+        <div className={cn(
+          "max-w-md mx-auto border shadow-2xl overflow-hidden transition-all duration-500",
+          theme.card,
+          theme.border,
+          ui.layout === "minimal" ? "rounded-2xl" : "rounded-[2.5rem]"
+        )}>
+          
+          {/* Real-time Status Header */}
+          <div className={cn(
+            "px-8 py-5 border-b flex items-center justify-between bg-opacity-50", 
+            theme.border,
+            theme.name === "Pure Dark" ? "bg-zinc-800/30" : "bg-black/5"
+          )}>
+            <span className={cn("text-[10px] font-black uppercase tracking-widest opacity-60", theme.text)}>
+              Current Status
+            </span>
+            <div className={cn(
+              "px-4 py-1.5 rounded-full text-[10px] font-black flex items-center gap-2",
+              isOpenNow 
+                ? "bg-emerald-500/10 text-emerald-500" 
+                : "bg-red-500/10 text-red-500"
+            )}>
+              <span className="relative flex h-2 w-2">
+                <span className={cn("animate-ping absolute inline-flex h-full w-full rounded-full opacity-75", isOpenNow ? "bg-emerald-400" : "bg-red-400")}></span>
+                <span className={cn("relative inline-flex rounded-full h-2 w-2", isOpenNow ? "bg-emerald-500" : "bg-red-500")}></span>
+              </span>
+              {isOpenNow ? "OPEN NOW" : "CLOSED"}
+            </div>
+          </div>
 
-          return (
-            <motion.div
-              key={row.day}
-              initial={{ opacity: 0, x: -10 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className={cn(
-                "relative flex items-center justify-between p-5 rounded-[1.5rem] transition-all duration-300",
-                isToday 
-                  ? "bg-slate-900 text-white shadow-xl scale-[1.02] z-10" 
-                  : "bg-white border border-slate-100 text-slate-600 hover:border-[var(--hr-primary)]"
-              )}
-            >
-              <div className="flex items-center gap-4">
-                <div className={cn(
-                  "h-10 w-10 rounded-xl flex items-center justify-center",
-                  isToday ? "bg-[var(--hr-primary)]" : "bg-slate-50"
-                )}>
-                  <Calendar className={cn("h-5 w-5", isToday ? "text-white" : "text-slate-400")} />
-                </div>
-                <div>
-                  <h3 className={cn("text-sm font-black uppercase tracking-tight", isToday ? "text-white" : "text-slate-900")}>
-                    {row.day}
-                    {isToday && <span className="ml-2 text-[10px] text-[var(--hr-primary)] animate-pulse">● Today</span>}
-                  </h3>
-                </div>
-              </div>
+          {/* Clean Row List */}
+          <div className={cn("divide-y", theme.name === "Pure Dark" ? "divide-white/5" : "divide-black/5")}>
+            {data.map((row) => {
+              const isToday = row.day === today;
+              const isClosed = row.is_closed;
 
-              <div className="flex items-center gap-6">
-                <div className="text-right">
-                  {isOpen ? (
-                    <p className={cn("text-sm font-bold italic", isToday ? "text-slate-300" : "text-slate-500")}>
-                      {formatTime(row.open_time)} <span className="mx-1 opacity-50">–</span> {formatTime(row.close_time)}
-                    </p>
-                  ) : (
-                    <p className="text-sm font-bold uppercase tracking-widest text-red-500 italic opacity-80">Closed</p>
+              return (
+                <div
+                  key={row.day}
+                  className={cn(
+                    "flex items-center justify-between px-8 py-5 transition-all",
+                    isToday 
+                      ? (theme.name === "Pure Dark" ? "bg-white/5" : "bg-black/[0.02]") 
+                      : "hover:bg-black/[0.01]"
                   )}
-                </div>
-                {!isToday && <ChevronRight className="h-4 w-4 text-slate-200" />}
-              </div>
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={cn(
+                      "text-sm font-bold tracking-tight",
+                      isToday ? theme.primary : "opacity-40",
+                      theme.text
+                    )}>
+                      {row.day}
+                    </span>
+                    {isToday && (
+                      <span className={cn(
+                        "text-[9px] px-2 py-0.5 rounded-md font-black uppercase tracking-tighter", 
+                        theme.accent, 
+                        theme.accentContent || "text-white" // Fix for Pure Dark/Lime/Lemon themes
+                      )}>
+                        TODAY
+                      </span>
+                    )}
+                  </div>
 
-              {/* Decorative background glow for Today */}
-              {isToday && (
-                <div className="absolute inset-0 bg-[var(--hr-primary)]/20 blur-2xl rounded-full -z-10" />
-              )}
-            </motion.div>
-          );
-        })}
+                  <div className="text-right">
+                    {!isClosed ? (
+                      <p className={cn("text-xs font-bold tracking-tight", theme.text)}>
+                        {formatTime(row.open_time)} 
+                        <span className="mx-1.5 opacity-30 font-normal italic text-[10px]">to</span> 
+                        {formatTime(row.close_time)}
+                      </p>
+                    ) : (
+                      <span className="text-[10px] font-black uppercase tracking-[0.15em] text-red-500/80">
+                        Closed
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </section>
   );

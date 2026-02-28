@@ -23,33 +23,27 @@ interface ContactSocialProps {
     website: string;
     socials: Record<string, string>;
   } | null;
-  theme?: "orange" | "blue" | "purple" | "emerald" | "rose";
+  theme: any; 
+  ui: any;    
 }
 
-const ContactSocial = ({ data, theme = "orange" }: ContactSocialProps) => {
-  if (!data) return <div className="h-40 w-full animate-pulse bg-slate-50" />;
-
-  const themeClasses = {
-    orange: "[--con-primary:#f97316] [--con-bg:theme(colors.orange.50)]",
-    blue: "[--con-primary:#3b82f6] [--con-bg:theme(colors.blue.50)]",
-    purple: "[--con-primary:#a855f7] [--con-bg:theme(colors.purple.50)]",
-    emerald: "[--con-primary:#10b981] [--con-bg:theme(colors.emerald.50)]",
-    rose: "[--con-primary:#f43f5e] [--con-bg:theme(colors.rose.50)]",
-  };
+const ContactSocial = ({ data, theme, ui }: ContactSocialProps) => {
+  if (!data) return <div className={cn("h-40 w-full animate-pulse rounded-3xl", theme.card)} />;
 
   const actions = [
     { id: 'call', val: data.phone, href: `tel:${data.phone}`, icon: Phone, label: "Call Now" },
-    { id: 'wa', val: data.whatsapp, href: `https://wa.me/${data.whatsapp.replace(/\D/g, '')}`, icon: MessageCircle, label: "WhatsApp" },
+    { id: 'wa', val: data.whatsapp, href: `https://wa.me/${data.whatsapp?.replace(/\D/g, '')}`, icon: MessageCircle, label: "WhatsApp" },
     { id: 'email', val: data.email, href: `mailto:${data.email}`, icon: Mail, label: "Email" },
     { id: 'map', val: data.mapUrl, href: data.mapUrl, icon: MapPin, label: "Visit Us" },
+    { id: 'web', val: data.website, href: data.website, icon: Globe, label: "Website" },
   ].filter(item => !!item.val);
 
   return (
-    <section className={cn("w-full py-12 space-y-12", themeClasses[theme])}>
+    <section className={cn("w-full py-16 space-y-16 transition-colors duration-500", theme.bg)}>
       
-      {/* Primary Actions: Wide Floating List */}
-      <div className="px-4 md:px-6 max-w-7xl mx-auto w-full">
-        <div className="flex flex-col gap-3">
+      {/* Primary Actions: Floating List */}
+      <div className="px-4 md:px-6 max-w-xl mx-auto w-full">
+        <div className="flex flex-col gap-4">
           {actions.map((action, idx) => (
             <motion.a
               key={action.id}
@@ -58,41 +52,69 @@ const ContactSocial = ({ data, theme = "orange" }: ContactSocialProps) => {
               rel="noreferrer"
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="group relative w-full flex items-center justify-between p-5 rounded-[2rem] bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:border-[var(--con-primary)] transition-all duration-300 overflow-hidden"
+              className={cn(
+                "group relative w-full flex items-center justify-between p-5 border transition-all duration-300 shadow-sm hover:shadow-xl active:scale-[0.98]",
+                theme.card,
+                theme.border,
+                ui.layout === "minimal" ? "rounded-2xl" : "rounded-[2.5rem]"
+              )}
             >
-              {/* Subtle Background Glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[var(--con-bg)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              
               <div className="flex items-center gap-5 relative z-10">
-                <div className="h-12 w-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center group-hover:bg-[var(--con-primary)] transition-colors shadow-lg">
-                  <action.icon className="h-5 w-5" />
+                {/* Icon Container - Fix: Using theme.accentContent for visibility */}
+                <div className={cn(
+                  "h-14 w-14 flex items-center justify-center transition-all duration-500 shadow-md",
+                  ui.layout === "minimal" ? "rounded-xl" : "rounded-3xl",
+                  theme.accent,
+                  theme.accentContent || "text-white"
+                )}>
+                  <action.icon className="h-6 w-6" />
                 </div>
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">{action.label}</p>
-                  <p className="text-sm font-bold text-slate-900 group-hover:text-[var(--con-primary)] transition-colors truncate max-w-[200px] md:max-w-md italic uppercase">
+
+                <div className="text-left">
+                  <p className={cn("text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-1", theme.text)}>
+                    {action.label}
+                  </p>
+                  <p className={cn("text-base font-bold truncate max-w-[160px] sm:max-w-xs tracking-tight", theme.text)}>
                     {action.val}
                   </p>
                 </div>
               </div>
 
-              <ArrowRight className="h-5 w-5 text-slate-300 group-hover:text-[var(--con-primary)] group-hover:translate-x-1 transition-all mr-2" />
+              <div className={cn(
+                "h-8 w-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-1",
+                theme.accent,
+                theme.accentContent || "text-white"
+              )}>
+                <ArrowRight className="h-4 w-4" />
+              </div>
             </motion.a>
           ))}
         </div>
       </div>
 
-      {/* Social Bar: Edge-to-Edge Dark Dock */}
-      <div className="relative w-full overflow-hidden">
-        <div className="bg-slate-900 py-10 px-4 md:px-6">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="text-center md:text-left">
-              <h3 className="text-white text-xl font-black italic uppercase tracking-tighter">Follow the <span className="text-[var(--con-primary)]">Journey</span></h3>
-              <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Connect on social platforms</p>
+      {/* Social Bar: Integrated Dock */}
+      <div className="px-4">
+        <div className={cn(
+          "max-w-xl mx-auto py-10 px-8 border transition-all duration-500 relative overflow-hidden",
+          theme.card,
+          theme.border,
+          ui.layout === "minimal" ? "rounded-3xl" : "rounded-[4rem]"
+        )}>
+          {/* Decorative background element */}
+          <div className={cn("absolute top-0 right-0 w-32 h-32 opacity-5 blur-3xl rounded-full", theme.accent)} />
+
+          <div className="flex flex-col items-center gap-8 relative z-10">
+            <div className="text-center">
+              <h3 className={cn("text-xl font-black uppercase italic tracking-tighter", theme.text)}>
+                Follow the <span className={cn("not-italic", theme.primary)}>Journey</span>
+              </h3>
+              <div className={cn("w-12 h-1 mx-auto mt-2 rounded-full", theme.accent)} />
             </div>
 
             <div className="flex flex-wrap justify-center gap-5">
-              {Object.entries(data.socials || {}).map(([key, url], index) => {
+              {Object.entries(data.socials || {}).map(([key, url]) => {
                 if (!url) return null;
                 const Icon = iconMap[key as keyof typeof iconMap];
                 if (!Icon) return null;
@@ -103,8 +125,28 @@ const ContactSocial = ({ data, theme = "orange" }: ContactSocialProps) => {
                     href={url}
                     target="_blank"
                     rel="noreferrer"
-                    whileHover={{ y: -8 }}
-                    className="h-14 w-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-[var(--con-primary)] hover:border-transparent transition-all shadow-2xl"
+                    whileHover={{ y: -8, scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className={cn(
+                      "h-14 w-14 flex items-center justify-center transition-all border shadow-lg",
+                      ui.layout === "minimal" ? "rounded-2xl" : "rounded-3xl",
+                      theme.card,
+                      theme.border,
+                      theme.text,
+                      // Dynamic hover state logic
+                      `hover:shadow-2xl hover:border-transparent transition-colors`
+                    )}
+                    // We use inline style for the hover background to avoid string replacement issues
+                    onMouseEnter={(e) => {
+                        const target = e.currentTarget;
+                        target.style.backgroundColor = 'var(--accent-color, currentColor)';
+                        target.style.color = 'var(--accent-content, white)';
+                    }}
+                    onMouseLeave={(e) => {
+                        const target = e.currentTarget;
+                        target.style.backgroundColor = '';
+                        target.style.color = '';
+                    }}
                   >
                     <Icon className="h-6 w-6" />
                   </motion.a>
