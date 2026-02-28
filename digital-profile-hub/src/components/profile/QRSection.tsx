@@ -1,64 +1,111 @@
 import { motion } from "framer-motion";
-import { QrCode } from "lucide-react";
+import { QrCode, Download } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { cn } from "@/lib/utils";
+import { useRef } from "react";
 
 interface QRSectionProps {
   username: string;
-  profileImage?: string; // Optional: To place in the center of the QR
-  theme?: "emerald" | "slate";
+  profileImage?: string;
+  theme: any; 
+  ui: any;
 }
 
-const QRSection = ({ username, profileImage, theme = "emerald" }: QRSectionProps) => {
+const QRSection = ({ username, profileImage, theme, ui }: QRSectionProps) => {
   const profileUrl = `${window.location.origin}/profile/${username}`;
+  const qrRef = useRef<SVGSVGElement>(null);
 
-  // Darker professional colors matching our new ProfileHeader
-  const themeClasses = {
-    emerald: "[--qr-text:#2D6A4F] [--qr-accent:#40916C]",
-    slate: "[--qr-text:#1E293B] [--qr-accent:#334155]",
+  const downloadQR = () => {
+    const svg = qrRef.current;
+    if (!svg) return;
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.onload = () => {
+      canvas.width = 1000;
+      canvas.height = 1000;
+      ctx?.drawImage(img, 0, 0, 1000, 1000);
+      const pngFile = canvas.toDataURL("image/png");
+      const downloadLink = document.createElement("a");
+      downloadLink.download = `${username}_qr.png`;
+      downloadLink.href = pngFile;
+      downloadLink.click();
+    };
+    img.src = "data:image/svg+xml;base64," + btoa(svgData);
   };
 
   return (
-    <section className={cn("py-12 bg-white flex flex-col items-center", themeClasses[theme])}>
-      {/* Section Title - Matches "QR Code" header in Screenshot 2/3 */}
+    <section className={cn(
+      "py-20 flex flex-col items-center transition-colors duration-500", 
+      theme.bg
+    )}>
+      {/* Section Title */}
       <motion.div 
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        className="text-center mb-6"
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="text-center mb-12"
       >
-        <h2 className="text-xl font-bold text-slate-800">QR Code</h2>
-        <div className="w-10 h-1 bg-[var(--qr-accent)] mx-auto mt-1 rounded-full" />
+        <div className="flex items-center justify-center gap-2 mb-2">
+            <QrCode className={cn("w-4 h-4", theme.primary)} />
+            <h2 className={cn("text-[10px] font-black uppercase tracking-[0.3em] opacity-50", theme.text)}>
+            Scan & Connect
+            </h2>
+        </div>
+        <h2 className={cn("text-2xl font-black italic uppercase tracking-tighter", theme.text)}>
+          Digital QR Card
+        </h2>
+        <div className={cn("w-12 h-1.5 mx-auto mt-3 rounded-full", theme.accent)} />
       </motion.div>
 
       {/* QR Card Container */}
       <div className="relative group">
-        {/* Subtle decorative shadow behind the QR */}
-        <div className="absolute -inset-4 bg-slate-50 rounded-[2.5rem] scale-95 group-hover:scale-100 transition-transform duration-500" />
+        {/* Glow Effect - Adapts to Theme Accent */}
+        <div className={cn(
+          "absolute -inset-6 rounded-[3rem] blur-2xl opacity-10 group-hover:opacity-20 transition-opacity duration-700",
+          theme.accent
+        )} />
         
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
           whileInView={{ scale: 1, opacity: 1 }}
           viewport={{ once: true }}
-          className="relative bg-white p-8 rounded-[2rem] shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] border border-slate-100"
+          className={cn(
+            "relative p-10 shadow-2xl border-2 transition-all duration-700",
+            ui.layout === "minimal" ? "rounded-[2rem]" : "rounded-[3.5rem]",
+            theme.card,
+            theme.border
+          )}
         >
-          {/* Branded Icon on top of QR as seen in screenshots */}
-          <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-slate-900 p-2 rounded-full border-4 border-white shadow-md">
-            <QrCode className="w-5 h-5 text-white" />
-          </div>
+          {/* Action Badge */}
+          <button 
+            onClick={downloadQR}
+            className={cn(
+              "absolute -top-6 left-1/2 -translate-x-1/2 p-3 rounded-2xl shadow-xl transition-all hover:scale-110 active:scale-90 border-2 z-10",
+              theme.accent,
+              theme.accentContent || "text-white",
+              "border-transparent"
+            )}
+          >
+            <Download className="w-5 h-5" strokeWidth={2.5} />
+          </button>
 
-          <div className="bg-white rounded-xl overflow-hidden">
+          <div className="bg-white p-4 rounded-[1.5rem] shadow-inner overflow-hidden flex items-center justify-center">
             <QRCodeSVG
+              ref={qrRef}
               value={profileUrl}
-              size={180}
+              size={200}
               level={"H"}
               includeMargin={false}
-              // UnoGreen style often has the brand logo in center
+              // Dark themes get black QR modules, light themes get theme-colored modules
+              fgColor={theme.name === "Pure Dark" ? "#000000" : "#111827"}
               imageSettings={profileImage ? {
                 src: profileImage,
                 x: undefined,
                 y: undefined,
-                height: 40,
-                width: 40,
+                height: 48,
+                width: 48,
                 excavate: true,
               } : undefined}
             />
@@ -66,15 +113,23 @@ const QRSection = ({ username, profileImage, theme = "emerald" }: QRSectionProps
         </motion.div>
       </div>
 
-      {/* Action Prompt */}
-      <motion.p 
+      {/* Branding / Footer Text */}
+      <motion.div 
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="mt-6 text-slate-400 text-xs font-medium uppercase tracking-widest"
+        transition={{ delay: 0.4 }}
+        className="mt-10 text-center space-y-2"
       >
-        Scan to save contact
-      </motion.p>
+        <p className={cn(
+          "text-[10px] font-black uppercase tracking-[0.4em] opacity-30",
+          theme.text
+        )}>
+          Point camera to save
+        </p>
+        <p className={cn("text-[9px] font-bold opacity-20", theme.text)}>
+          {profileUrl.replace('https://', '')}
+        </p>
+      </motion.div>
     </section>
   );
 };

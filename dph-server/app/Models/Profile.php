@@ -13,7 +13,7 @@ class Profile extends Model
         'user_id','username','cover_image','profile_image',
         'designation','company_name','company_description',
         'phone','email','whatsapp','google_map_link',
-        'website','qr_code_path','is_active', 'address'
+        'website','qr_code_path','is_active', 'address','theme_id'
     ];
 
     public function user()

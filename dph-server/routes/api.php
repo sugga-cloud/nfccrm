@@ -168,6 +168,7 @@ Route::middleware('auth:sanctum','is_active')->group(function () {
         Route::post('/profile/hours', [ProfileController::class, 'updateHours']);
         Route::get('/profile/social-links', [ProfileController::class, 'getSocialLinks']);
         Route::post('/profile/social-links', [ProfileController::class, 'updateSocialLinks']);
+        Route::post('/profile/update-theme', [ProfileController::class, 'updateTheme']);
     });
 });
 

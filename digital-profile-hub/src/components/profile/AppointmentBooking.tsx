@@ -2,7 +2,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { 
   CalendarIcon, Loader2, CheckCircle2, User, Phone, 
-  Mail, Clock, ChevronRight, Sparkles 
+  Mail, ChevronRight, Sparkles 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -16,24 +16,21 @@ import { toast } from "sonner";
 interface AppointmentBookingProps {
   profileId: number;
   customTimeSlots?: string[];
-  theme?: "emerald" | "slate";
+  theme: any; 
+  ui: any;    
 }
 
 const AppointmentBooking = ({ 
   profileId, 
   customTimeSlots, 
-  theme = "emerald" 
+  theme,
+  ui
 }: AppointmentBookingProps) => {
   const [date, setDate] = useState<Date>();
   const [slot, setSlot] = useState("");
   const [formData, setFormData] = useState({ name: "", email: "", phone: "" });
   const [loading, setLoading] = useState(false);
   const [isBooked, setIsBooked] = useState(false);
-
-  const themeClasses = {
-    emerald: "[--apt-primary:#2D6A4F] [--apt-accent:#40916C] [--apt-bg:#F1F8F6]",
-    slate: "[--apt-primary:#1E293B] [--apt-accent:#334155] [--apt-bg:#F8FAFC]",
-  };
 
   const availableSlots = customTimeSlots || [
     "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", 
@@ -67,37 +64,52 @@ const AppointmentBooking = ({
   };
 
   return (
-    <section className={cn("w-full py-12 bg-white", themeClasses[theme])}>
+    <section className={cn("w-full py-16 transition-colors duration-500", theme.bg)}>
       <div className="container mx-auto px-4">
-        {/* Simple Section Header */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="flex items-center gap-2 mb-1">
-             <CalendarIcon className="h-4 w-4 text-[var(--apt-primary)]" />
-             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Schedule</span>
+        
+        {/* Section Header - Respects UI Layout */}
+        <div className={cn(
+          "flex flex-col mb-10",
+          ui.layout === "minimal" ? "items-start text-left" : "items-center text-center"
+        )}>
+          <div className="flex items-center gap-2 mb-2">
+             <Sparkles className={cn("h-4 w-4", theme.primary)} />
+             <span className={cn("text-[10px] font-bold uppercase tracking-[0.3em] opacity-50", theme.text)}>
+               Reservations
+             </span>
           </div>
-          <h2 className="text-xl font-bold text-slate-800">Book Appointment</h2>
-          <div className="w-10 h-1 bg-[var(--apt-primary)] mt-1.5 rounded-full" />
+          <h2 className={cn("text-2xl font-black italic uppercase tracking-tighter", theme.text)}>
+            Book an <span className={theme.primary}>Appointment</span>
+          </h2>
+          <div className={cn("w-12 h-1 mt-2 rounded-full", theme.accent)} />
         </div>
 
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-xl mx-auto">
           <AnimatePresence mode="wait">
             {isBooked ? (
               <motion.div 
                 key="success"
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white rounded-[2rem] p-10 text-center border border-slate-100 shadow-sm"
+                className={cn(
+                  "p-10 text-center border shadow-2xl transition-all",
+                  theme.card, theme.border, 
+                  ui.layout === "minimal" ? "rounded-2xl" : "rounded-[3rem]"
+                )}
               >
-                <div className="mx-auto h-16 w-16 rounded-full bg-emerald-50 flex items-center justify-center mb-6">
-                  <CheckCircle2 className="h-8 w-8 text-emerald-500" />
+                <div className={cn(
+                  "mx-auto h-20 w-20 rounded-full flex items-center justify-center mb-6", 
+                  theme.accent, "bg-opacity-20"
+                )}>
+                  <CheckCircle2 className={cn("h-10 w-10", theme.name === "Pure Dark" ? "text-white" : theme.primary.replace('text-', 'text-'))} />
                 </div>
-                <h2 className="text-2xl font-bold text-slate-900">Request Sent</h2>
-                <p className="text-slate-500 mt-3 text-sm font-medium">
-                  We'll contact you for <span className="text-slate-900 font-bold">{slot}</span> on <span className="text-slate-900 font-bold">{date && format(date, "PPP")}</span>.
+                <h2 className={cn("text-2xl font-bold tracking-tight", theme.text)}>Request Received</h2>
+                <p className={cn("mt-4 text-sm opacity-60 leading-relaxed", theme.text)}>
+                  We'll confirm your slot for <span className="font-bold opacity-100">{slot}</span> on <span className="font-bold opacity-100">{date && format(date, "PPP")}</span> shortly.
                 </p>
                 <Button 
                   variant="outline" 
-                  className="mt-8 rounded-xl px-8 border-slate-200 font-bold text-xs"
+                  className={cn("mt-8 rounded-xl px-8 font-bold text-xs uppercase tracking-widest", theme.border, theme.text)}
                   onClick={() => setIsBooked(false)}
                 >
                   Schedule Another
@@ -106,48 +118,83 @@ const AppointmentBooking = ({
             ) : (
               <motion.div 
                 key="form"
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-6"
               >
-                {/* Step 1: Info */}
-                <div className="grid grid-cols-1 gap-4">
-                   <div className="relative">
-                    <User className="absolute left-4 top-3 h-4 w-4 text-slate-400" />
-                    <Input placeholder="Full Name" className="pl-11 h-12 rounded-xl bg-slate-50 border-slate-100 focus:bg-white" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                {/* Step 1: Client Info */}
+                <div className={cn(
+                  "p-6 border shadow-sm space-y-4", 
+                  theme.card, theme.border,
+                  ui.layout === "minimal" ? "rounded-2xl" : "rounded-[2.5rem]"
+                )}>
+                  <p className={cn("text-[10px] font-black uppercase tracking-widest opacity-40 mb-2", theme.text)}>Contact Information</p>
+                  
+                  <div className="relative">
+                    <User className={cn("absolute left-4 top-3.5 h-4 w-4 opacity-40", theme.text)} />
+                    <Input 
+                      placeholder="Your Full Name" 
+                      className={cn(
+                        "pl-11 h-12 rounded-xl border-none ring-1 ring-inset focus-visible:ring-2 transition-all", 
+                        theme.bg, theme.text, "ring-white/10"
+                      )} 
+                      value={formData.name} 
+                      onChange={(e) => setFormData({...formData, name: e.target.value})} 
+                    />
                   </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="relative">
-                      <Mail className="absolute left-4 top-3 h-4 w-4 text-slate-400" />
-                      <Input placeholder="Email Address" className="pl-11 h-12 rounded-xl bg-slate-50 border-slate-100 focus:bg-white" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                      <Mail className={cn("absolute left-4 top-3.5 h-4 w-4 opacity-40", theme.text)} />
+                      <Input 
+                        placeholder="Email Address" 
+                        className={cn("pl-11 h-12 rounded-xl border-none ring-1 ring-inset", theme.bg, theme.text, "ring-white/10")} 
+                        value={formData.email} 
+                        onChange={(e) => setFormData({...formData, email: e.target.value})} 
+                      />
                     </div>
                     <div className="relative">
-                      <Phone className="absolute left-4 top-3 h-4 w-4 text-slate-400" />
-                      <Input placeholder="Phone Number" className="pl-11 h-12 rounded-xl bg-slate-50 border-slate-100 focus:bg-white" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
+                      <Phone className={cn("absolute left-4 top-3.5 h-4 w-4 opacity-40", theme.text)} />
+                      <Input 
+                        placeholder="Phone Number" 
+                        className={cn("pl-11 h-12 rounded-xl border-none ring-1 ring-inset", theme.bg, theme.text, "ring-white/10")} 
+                        value={formData.phone} 
+                        onChange={(e) => setFormData({...formData, phone: e.target.value})} 
+                      />
                     </div>
                   </div>
                 </div>
 
-                {/* Step 2: Date Picker */}
-                <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
-                  <div className="flex flex-col md:flex-row gap-6">
-                    <div className="flex-1 space-y-3">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">1. Select Date</label>
+                {/* Step 2: Date & Time Select */}
+                <div className={cn(
+                  "p-6 border shadow-sm space-y-6", 
+                  theme.card, theme.border,
+                  ui.layout === "minimal" ? "rounded-2xl" : "rounded-[2.5rem]"
+                )}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <label className={cn("text-[10px] font-black uppercase tracking-widest opacity-40", theme.text)}>1. Pick Date</label>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button variant="outline" className="w-full h-12 rounded-xl border-slate-200 justify-between px-4 bg-white">
-                            {date ? format(date, "PPP") : "Choose a date"}
-                            <CalendarIcon className="h-4 w-4 text-[var(--apt-primary)]" />
+                          <Button variant="outline" className={cn("w-full h-12 rounded-xl justify-between px-4 border-none ring-1 ring-inset ring-white/10", theme.bg, theme.text)}>
+                            {date ? format(date, "MMM dd, yyyy") : "Select Date"}
+                            <CalendarIcon className={cn("h-4 w-4 opacity-50", theme.primary)} />
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0 border-none shadow-xl rounded-2xl" align="start">
-                          <Calendar mode="single" selected={date} onSelect={setDate} disabled={(d) => d < new Date()} />
+                        <PopoverContent className="w-auto p-0 border-none shadow-2xl rounded-2xl overflow-hidden" align="start">
+                          <Calendar 
+                            mode="single" 
+                            selected={date} 
+                            onSelect={setDate} 
+                            disabled={(d) => d < new Date()}
+                            className={cn(theme.card, theme.text)}
+                          />
                         </PopoverContent>
                       </Popover>
                     </div>
 
-                    <div className="flex-1 space-y-3">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">2. Select Time</label>
+                    <div className="space-y-3">
+                      <label className={cn("text-[10px] font-black uppercase tracking-widest opacity-40", theme.text)}>2. Pick Time</label>
                       <div className="grid grid-cols-2 gap-2">
                         {availableSlots.slice(0, 4).map((t) => (
                           <button
@@ -156,8 +203,8 @@ const AppointmentBooking = ({
                             className={cn(
                               "h-10 rounded-lg text-[10px] font-bold uppercase transition-all border",
                               slot === t 
-                                ? "bg-[var(--apt-primary)] border-[var(--apt-primary)] text-white shadow-md" 
-                                : "bg-white border-slate-200 text-slate-600 hover:border-slate-400"
+                                ? cn(theme.accent, theme.accentContent, "border-transparent shadow-lg scale-105") 
+                                : cn(theme.bg, theme.border, theme.text, "opacity-60 hover:opacity-100")
                             )}
                           >
                             {t}
@@ -168,14 +215,20 @@ const AppointmentBooking = ({
                   </div>
                 </div>
 
+                {/* Main Action Button - Uses accentContent for Pure Dark fix */}
                 <Button 
-                  className="w-full h-14 bg-[var(--apt-primary)] hover:bg-[var(--apt-accent)] text-white rounded-xl text-sm font-bold shadow-lg transition-all"
+                  className={cn(
+                    "w-full h-16 rounded-2xl text-sm font-black uppercase tracking-widest shadow-xl transition-all active:scale-[0.98]",
+                    theme.accent, 
+                    theme.accentContent, // <--- This fixes the invisible text/icon issue
+                    "hover:brightness-110"
+                  )}
                   disabled={loading || !date || !slot || !formData.name}
                   onClick={handleBooking}
                 >
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : (
-                    <span className="flex items-center gap-2">
-                      Confirm Booking <ChevronRight className="h-4 w-4" />
+                    <span className="flex items-center gap-3">
+                      Confirm Appointment <ChevronRight className="h-5 w-5" />
                     </span>
                   )}
                 </Button>

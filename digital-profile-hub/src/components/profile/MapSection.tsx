@@ -1,94 +1,156 @@
-import { MapPin, Navigation, Copy, ExternalLink } from "lucide-react";
+import { MapPin, Navigation, Copy, ExternalLink, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface MapSectionProps {
   profile: any;
+  theme: any; 
+  ui: any;    
 }
 
-const MapSection = ({ profile }: MapSectionProps) => {
+const MapSection = ({ profile, theme, ui }: MapSectionProps) => {
   const address = profile.address || "New York, NY";
-  
-  // Clean address for URL
   const encodedAddress = encodeURIComponent(address);
   
-  // Standard Embed URL (No API Key required)
-  const mapEmbedUrl = `https://maps.google.com/maps?q=${encodedAddress}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
-  
-  // External link for the "Directions" button
+  // Fixed Template Literals
+  const mapEmbedUrl = `https://maps.google.com/maps?q=${encodedAddress}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
   const googleMapUrl = profile.google_map_link || `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+  
+  /**
+   * Google Review Link Logic
+   * If you have a specific Place ID, use: https://search.google.com/local/writereview?placeid=YOUR_ID
+   * Otherwise, we search for the address/business name and trigger the review intent.
+   */
+  const googleReviewUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}&query_place_id=${profile.google_place_id || ''}`;
 
   const copyAddress = () => {
     navigator.clipboard.writeText(address);
-    toast.success("Address copied!");
+    toast.success("Address copied to clipboard!");
   };
 
+  const isDarkTheme = 
+    theme.bg?.includes('black') || 
+    theme.bg?.includes('slate-950') || 
+    theme.bg?.includes('zinc-950') ||
+    theme.name === "Pure Dark";
+
   return (
-    <section className="w-full py-12 px-4 bg-white">
-      <div className="max-w-md mx-auto">
+    <section className={cn("w-full py-16 px-4 transition-colors duration-500", theme.bg)}>
+      <div className="max-w-xl mx-auto">
+        
         {/* Header */}
-        <div className="flex flex-col items-center mb-8 text-center">
-          <div className="flex items-center gap-2 mb-1">
-             <MapPin className="h-4 w-4 text-orange-500" />
-             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Find Us</span>
+        <div className={cn(
+          "flex flex-col mb-10",
+          ui.layout === "minimal" ? "items-start text-left" : "items-center text-center"
+        )}>
+          <div className="flex items-center gap-2 mb-2">
+             <MapPin className={cn("h-4 w-4", theme.primary)} />
+             <span className={cn("text-[10px] font-black uppercase tracking-[0.3em] opacity-50", theme.text)}>
+               Location
+             </span>
           </div>
-          <h2 className="text-xl font-bold text-slate-800">Our Location</h2>
-          <div className="w-10 h-1 bg-orange-500 mt-1.5 rounded-full" />
+          <h2 className={cn("text-2xl font-black italic uppercase tracking-tighter", theme.text)}>Visit Our Space</h2>
+          <div className={cn("w-12 h-1.5 mt-2 rounded-full", theme.accent)} />
         </div>
 
-        {/* Map Frame */}
-        <div className="relative rounded-[2.5rem] overflow-hidden border-4 border-slate-900 shadow-2xl bg-slate-100 aspect-square md:aspect-video">
+        {/* Map Frame Container */}
+        <div className={cn(
+          "relative overflow-hidden border shadow-2xl transition-all duration-700 aspect-square md:aspect-[16/10] mb-6",
+          ui.layout === "minimal" ? "rounded-3xl" : "rounded-[3rem]",
+          theme.border,
+          isDarkTheme ? "bg-zinc-900" : "bg-zinc-100"
+        )}>
           
-          {/* DARK MODE TRICK: 
-            We use a combination of grayscale and invert filters to turn the 
-            standard light map into a dark theme map without an API key.
-          */}
           <iframe
             title="Location Map"
-            className="absolute inset-0 w-full h-full grayscale invert-[0.9] contrast-[1.2] opacity-90"
+            className={cn(
+              "absolute inset-0 w-full h-full transition-all duration-1000",
+              isDarkTheme 
+                ? "grayscale invert-[0.92] contrast-[1.1] brightness-[0.9] opacity-70" 
+                : "grayscale-[0.1] opacity-90"
+            )}
             frameBorder="0"
             scrolling="no"
-            marginHeight={0}
-            marginWidth={0}
             src={mapEmbedUrl}
           ></iframe>
 
-          {/* Overlay Content */}
-          <div className="absolute inset-x-4 bottom-4">
-            <div className="bg-slate-900/95 backdrop-blur-md p-5 rounded-[2rem] border border-slate-800 shadow-2xl">
-              <h3 className="text-white font-bold text-sm mb-4 line-clamp-2">
-                {address}
-              </h3>
+          <button 
+            onClick={() => window.open(googleMapUrl, '_blank')}
+            className={cn(
+              "absolute top-5 right-5 h-12 w-12 backdrop-blur-xl rounded-full flex items-center justify-center border transition-all hover:scale-110 active:scale-90 z-20 shadow-xl",
+              theme.card,
+              theme.border,
+              theme.text
+            )}
+          >
+            <ExternalLink className="h-5 w-5 opacity-70" />
+          </button>
+
+          {/* Floating Address Overlay */}
+          <div className="absolute inset-x-5 bottom-5 z-20">
+            <div className={cn(
+              "backdrop-blur-xl p-6 border shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-all",
+              ui.layout === "minimal" ? "rounded-2xl" : "rounded-[2.2rem]",
+              theme.card,
+              theme.border,
+              "bg-opacity-80"
+            )}>
+              <div className="flex items-start gap-4 mb-5">
+                <div className={cn("mt-1 p-2 rounded-lg bg-opacity-10", theme.accent.replace('bg-', 'bg-'))}>
+                    <MapPin className={cn("h-4 w-4", theme.primary)} />
+                </div>
+                <h3 className={cn("font-bold text-sm leading-relaxed", theme.text)}>
+                  {address}
+                </h3>
+              </div>
               
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <Button 
                   onClick={() => window.open(googleMapUrl, '_blank')}
-                  className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl h-11 font-bold text-xs gap-2"
+                  className={cn(
+                    "rounded-xl h-12 font-black uppercase tracking-widest text-[10px] gap-2 transition-all shadow-lg active:scale-95",
+                    theme.accent,
+                    theme.accentContent || "text-white"
+                  )}
                 >
-                  <Navigation className="h-3.5 w-3.5" />
-                  Directions
+                  <Navigation className="h-4 w-4" />
+                  Route
                 </Button>
                 
                 <Button 
                   variant="outline"
                   onClick={copyAddress}
-                  className="bg-transparent border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white rounded-xl h-11 font-bold text-xs gap-2"
+                  className={cn(
+                    "bg-transparent rounded-xl h-12 font-black uppercase tracking-widest text-[10px] gap-2 transition-all active:scale-95 border-2",
+                    theme.border,
+                    theme.text
+                  )}
                 >
-                  <Copy className="h-3.5 w-3.5" />
+                  <Copy className="h-4 w-4" />
                   Copy
                 </Button>
               </div>
             </div>
           </div>
-
-          {/* Top Right External Link Button */}
-          <button 
-            onClick={() => window.open(googleMapUrl, '_blank')}
-            className="absolute top-4 right-4 h-10 w-10 bg-slate-900/50 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 text-white active:scale-90 transition-transform"
-          >
-            <ExternalLink className="h-4 w-4" />
-          </button>
         </div>
+
+        {/* --- GOOGLE REVIEW BUTTON --- */}
+        <Button 
+          onClick={() => window.open(googleReviewUrl, '_blank')}
+          className={cn(
+            "w-full h-16 rounded-2xl font-black uppercase tracking-[0.2em] text-xs gap-3 transition-all shadow-xl hover:scale-[1.02] active:scale-95",
+            theme.card,
+            theme.border,
+            theme.text
+          )}
+        >
+          <div className="flex items-center justify-center h-8 w-8 rounded-full bg-yellow-400 text-white shadow-inner">
+            <Star className="h-4 w-4 fill-current" />
+          </div>
+          Review us on Google
+        </Button>
+
       </div>
     </section>
   );

@@ -266,4 +266,33 @@ if ($activeSubscription) {
 
         return response()->json(['message' => 'Social links synchronized successfully.']);
     }
+
+    /**
+     * Update Profile Theme
+     */
+    public function updateTheme(Request $request)
+    {
+        // 1. Get the profile belonging to the authenticated user
+        $profile = Profile::where('user_id', Auth::id())->first();
+
+        if (!$profile) {
+            return response()->json(['message' => 'Profile not found'], 404);
+        }
+
+        // 2. Validate the request
+        // Adjust the validation rules if your theme IDs are strings or specific numbers
+        $validated = $request->validate([
+            'theme_id' => 'required|string|max:50', 
+        ]);
+
+        // 3. Update the theme_id column
+        $profile->update([
+            'theme_id' => $validated['theme_id']
+        ]);
+
+        return response()->json([
+            'message' => 'Theme updated successfully',
+            'theme_id' => $profile->theme_id
+        ]);
+    }
 }
