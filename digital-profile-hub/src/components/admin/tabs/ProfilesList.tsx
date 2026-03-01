@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { 
   Search, User, ShieldCheck, ShieldAlert, 
   ExternalLink, MoreHorizontal, Mail, Fingerprint,
-  Calendar, CreditCard, ChevronDown, Clock
+  Calendar, CreditCard, ChevronDown, Clock, Trash2, Edit2
 } from "lucide-react";
 import { 
   DropdownMenu, 
@@ -242,6 +242,35 @@ const ProfilesList = () => {
                             onClick={() => window.open(`/${p.username}`, '_blank')}
                           >
                             <ExternalLink className="h-3 w-3" /> Portal
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-12 w-12 rounded-xl text-blue-500"
+                            onClick={() => {
+                              // navigate to create tab with profile ID for editing
+                              window.location.href = `/admin?tab=create&profileId=${p.id}`;
+                            }}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className="h-12 w-12 rounded-xl"
+                            onClick={async () => {
+                              if (confirm('Permanently delete this profile?')) {
+                                try {
+                                  await api.delete(`/admin/profiles/${p.id}`);
+                                  setProfiles((prev) => prev.filter((x) => x.id !== p.id));
+                                  toast.success('Profile deleted');
+                                } catch (err) {
+                                  toast.error('Delete failed');
+                                }
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>

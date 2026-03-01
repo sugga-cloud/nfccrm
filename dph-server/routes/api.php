@@ -181,6 +181,11 @@ Route::middleware('auth:sanctum','is_active')->group(function () {
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/analytics', [AdminController::class, 'analytics']); // For AdminAnalytics tab
     Route::get('/profiles', [AdminController::class, 'profiles']);   // For ProfilesList tab
+    // Admin profile management
+    Route::post('/profiles', [AdminController::class, 'storeProfile']);            // create new profile
+    Route::put('/profiles/{profile}', [AdminController::class, 'updateProfile']);  // update existing profile
+    Route::delete('/profiles/{profile}', [AdminController::class, 'destroyProfile']); // delete profile
+    Route::get('/profiles/{profile}', [AdminController::class, 'profileDetail']); // single profile for editing
     Route::get('/users', [AdminController::class, 'users']);         // For UsersTab
     Route::get('/payments', [PaymentController::class, 'payments']);   // For PaymentsTab
     Route::get('/plans', [AdminController::class, 'plans']);

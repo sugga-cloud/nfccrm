@@ -7,11 +7,13 @@ use App\Models\User;
 use App\Models\Profile;
 use App\Models\Enquiry;
 use App\Models\Product;
+use App\Models\Service;
 use App\Models\Payment;
 use App\Models\StorageUsage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class AdminController extends Controller
@@ -137,6 +139,213 @@ class AdminController extends Controller
         ]);
     }
 
+ /**
+ * ADMIN: create a new profile (and user if necessary)
+ */
+public function storeProfile(Request $request)
+{
+    // 1. Initial lookup to determine validation rules
+    $user = User::where('email', $request->email)->first();
+    $existingProfile = $user ? $user->profile : null;
+
+    $rules = [
+        'email' => 'required|email' . ($user ? '' : '|unique:users,email'),
+        'username' => 'required|string|max:255|unique:profiles,username' . ($existingProfile ? ',' . $existingProfile->id : ''),
+        'designation' => 'nullable|string|max:255',
+        'company_name' => 'nullable|string|max:255',
+        'phone' => 'nullable|string',
+        'whatsapp' => 'nullable|string',
+        'website' => 'nullable|string',
+        'google_map_link' => 'nullable|string',
+        'address' => 'nullable|string',
+        'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+        'theme_id' => 'nullable|string|max:50',
+    ];
+
+    $validated = $request->validate($rules);
+
+    return DB::transaction(function () use ($request, $validated, $user, $existingProfile) {
+        
+        // 2. If profile exists, STOP and redirect to Update logic immediately
+        if ($existingProfile) {
+            return $this->updateProfile($request, $existingProfile);
+        }
+
+        // 3. If User exists but no profile, use that user. Otherwise, create user.
+        if (!$user) {
+            $user = User::create([
+                'full_name' => $validated['username'],
+                'email' => $validated['email'],
+                'password' => bcrypt('12345678'), // Default password, should prompt reset
+                'role_id' => 2,
+                'is_active' => true,
+            ]);
+        }
+
+        // 4. Double check: Ensure no profile was created by a race condition
+        // This is the "Safety Guard" against the 1062 error
+        $profile = Profile::updateOrCreate(
+            ['user_id' => $user->id], // Search criteria
+            $this->mapProfileData($request, $validated) // Data to insert/update
+        );
+
+        $this->saveRelatedData($request, $profile);
+
+        return response()->json($profile, 201);
+    });
+}
+
+/**
+ * Helper to clean up data mapping for profiles
+ */
+private function mapProfileData(Request $request, $validated)
+{
+    $data = $validated;
+    
+    if ($request->hasFile('profile_image')) {
+        $path = $request->file('profile_image')->store('profiles/avatars', 'public');
+        $data['profile_image'] = asset('storage/' . $path);
+    }
+    
+    if ($request->hasFile('cover_image')) {
+        $path = $request->file('cover_image')->store('profiles/covers', 'public');
+        $data['cover_image'] = asset('storage/' . $path);
+    }
+    
+    return $data;
+}
+
+/**
+ * ADMIN: update profile (and optionally user email)
+ */
+public function updateProfile(Request $request, Profile $profile)
+{
+    $validated = $request->validate([
+        'email' => 'nullable|email|unique:users,email,' . $profile->user_id,
+        'username' => 'nullable|string|max:255|unique:profiles,username,' . $profile->id,
+        'designation' => 'nullable|string|max:255',
+        'company_name' => 'nullable|string|max:255',
+        'phone' => 'nullable|string',
+        'whatsapp' => 'nullable|string',
+        'website' => 'nullable|string',
+        'google_map_link' => 'nullable|string',
+        'address' => 'nullable|string',
+        'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+        'theme_id' => 'nullable|string|max:50',
+    ]);
+
+    return DB::transaction(function () use ($request, $validated, $profile) {
+        if (isset($validated['email'])) {
+            $profile->user->update(['email' => $validated['email']]);
+        }
+
+        // Handle Image Deletions before replacing
+        foreach (['profile_image', 'cover_image'] as $field) {
+            if ($request->hasFile($field)) {
+                if ($profile->$field) {
+                    Storage::disk('public')->delete(str_replace(asset('storage/'), '', $profile->$field));
+                }
+                $folder = ($field === 'profile_image') ? 'avatars' : 'covers';
+                $path = $request->file($field)->store("profiles/$folder", 'public');
+                $validated[$field] = asset('storage/' . $path);
+            }
+        }
+
+        $profile->update($validated);
+        
+        // Clean up old related files before wiping database records
+        foreach ($profile->gallery as $item) {
+            Storage::disk('public')->delete(str_replace(asset('storage/'), '', $item->media_url));
+        }
+        foreach ($profile->services as $item) {
+            if ($item->image) Storage::disk('public')->delete(str_replace(asset('storage/'), '', $item->image));
+        }
+        foreach ($profile->products as $item) {
+            if ($item->image) Storage::disk('public')->delete(str_replace(asset('storage/'), '', $item->image));
+        }
+
+        $profile->businessHours()->delete();
+        $profile->socialLinks()->delete();
+        $profile->gallery()->delete();
+        $profile->services()->delete();
+        $profile->products()->delete();
+
+        $this->saveRelatedData($request, $profile);
+
+        return response()->json(['message' => 'Profile updated successfully', 'profile' => $profile->load(['services', 'products', 'gallery'])]);
+    });
+}
+
+/**
+ * Helper to handle the repetitive related data saving
+ */
+private function saveRelatedData(Request $request, Profile $profile)
+{
+    // Business Hours
+    if ($request->filled('hours')) {
+        $hours = json_decode($request->hours, true);
+        foreach ($hours as $h) {
+            $profile->businessHours()->create([
+                'day' => $h['day'],
+                'open_time' => $h['isOpen'] ? $h['open'] : null,
+                'close_time' => $h['isOpen'] ? $h['close'] : null,
+                'is_closed' => !$h['isOpen'],
+            ]);
+        }
+    }
+
+    // Social Links
+    if ($request->filled('links')) {
+        $linksArr = json_decode($request->links, true);
+        foreach ($linksArr as $platform => $url) {
+            if (!empty($url)) {
+                $profile->socialLinks()->create(['platform' => $platform, 'url' => $url]);
+            }
+        }
+    }
+
+    // Gallery
+    if ($request->hasFile('gallery')) {
+        foreach ($request->file('gallery') as $file) {
+            $path = $file->store('profiles/gallery', 'public');
+            $profile->gallery()->create(['media_type' => 'image', 'media_url' => asset('storage/' . $path)]);
+        }
+    }
+
+    // Services
+    $servicesData = $request->input('services', []);
+    foreach ($servicesData as $idx => $s) {
+        $data = ['title' => $s['title'] ?? '', 'description' => $s['description'] ?? ''];
+        if ($request->hasFile("services.$idx.image")) {
+            $path = $request->file("services.$idx.image")->store('profiles/services', 'public');
+            $data['image'] = asset('storage/' . $path);
+        }
+        $profile->services()->create($data);
+    }
+
+    // Products
+    $productsData = $request->input('products', []);
+    foreach ($productsData as $idx => $p) {
+        $data = ['name' => $p['name'] ?? '', 'description' => $p['description'] ?? '', 'price' => $p['price'] ?? 0];
+        if ($request->hasFile("products.$idx.image")) {
+            $path = $request->file("products.$idx.image")->store('profiles/products', 'public');
+            $data['image'] = asset('storage/' . $path);
+        }
+        $profile->products()->create($data);
+    }
+}
+
+    /**
+     * ADMIN: delete a profile (also cascades via relationship)
+     */
+    public function destroyProfile(Profile $profile)
+    {
+        $profile->delete();
+        return response()->json(['message' => 'Profile deleted successfully']);
+    }
+
     /**
      * List All Users and Roles
      * Used by: UsersTab.tsx
@@ -242,6 +451,23 @@ public function planDetail($id)
 
         return response()->json($plan);
     }
+
+    /**
+     * Return a single profile with related data for editing
+     */
+    public function profileDetail(Profile $profile)
+    {
+        $profile->load([
+            'businessHours',
+            'socialLinks',
+            'gallery',
+            'services',
+            'products'
+        ]);
+
+        return response()->json($profile);
+    }
+
 /**
  * CREATE: Store a new plan
  */

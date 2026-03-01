@@ -12,11 +12,19 @@ import { themeRegistry } from "@/config/themeConfig";
 interface AdminProps {
   initialThemeId?: string | number;
   onSave?: (themeId: string | number) => void;
+  /** Notify parent when theme selection changes */
+  onThemeChange?: (themeId: string | number) => void;
+  /**
+   * When true the component will skip the network request and hide the
+   * publish/save button. Useful when embedding inside another form that
+   * handles saving.
+   */
+  disableApi?: boolean;
 }
 
 const AdminThemeSelector = ({ 
   initialThemeId = "1", 
-  onSave 
+  onSave ,disableApi = false,onThemeChange
 }: AdminProps) => {
   
   // 1. Setup Theme List from Registry
@@ -28,17 +36,29 @@ const AdminThemeSelector = ({
   );
   const [isSaving, setIsSaving] = useState(false);
 
+  // keep internal selection in sync when parent supplies a different initialThemeId
+  React.useEffect(() => {
+    console.log("initialThemeId changed", initialThemeId);
+    const t = themeRegistry.themes[initialThemeId as keyof typeof themeRegistry.themes];
+    if (t) setSelectedTheme(t);
+  }, [initialThemeId]);
+
   // 3. Save Function using your Axios Instance
   const handleSave = async () => {
     setIsSaving(true);
     console.log(selectedTheme);
     try {
-      const response = await api.post("/profile/update-theme", {
-        theme_id: selectedTheme.id,
-      });
+      if (!disableApi) {
+        const response = await api.post("/profile/update-theme", {
+          theme_id: selectedTheme.id,
+        });
 
-      if (response.status === 200) {
-        toast.success("Theme identity updated!");
+        if (response.status === 200) {
+          toast.success("Theme identity updated!");
+          if (onSave) onSave(selectedTheme.id);
+        }
+      } else {
+        // simply invoke callback, no network request
         if (onSave) onSave(selectedTheme.id);
       }
     } catch (error: any) {
@@ -78,9 +98,17 @@ const AdminThemeSelector = ({
           >
             {themesList.map((t: any) => (
               <button
+                type="button"
                 key={t.id}
                 disabled={isSaving}
-                onClick={() => setSelectedTheme(t)}
+                onClick={() => {
+                  console.log("selector clicked", t.id);
+                  setSelectedTheme(t);
+                  if (onThemeChange) {
+                    console.log("calling onThemeChange", t.id);
+                    onThemeChange(t.id);
+                  }
+                }}
                 className={cn(
                   "group relative p-6 rounded-[2.5rem] border-2 transition-all duration-500 text-left",
                   selectedTheme.id === t.id 
@@ -160,26 +188,28 @@ const AdminThemeSelector = ({
                 </div>
             </div>
 
-            {/* Persistence Controls */}
-            <div className="mt-10 space-y-4">
-                <Button 
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className="w-full h-16 rounded-[1.8rem] bg-zinc-900 hover:bg-black text-white font-black uppercase tracking-[0.2em] text-[11px] transition-all active:scale-95 shadow-lg disabled:opacity-70"
-                >
-                    {isSaving ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <Save className="w-4 h-4 mr-2" />
-                    )}
-                    {isSaving ? "Syncing..." : "Publish Theme"}
-                </Button>
-                
-                <div className="flex items-center justify-center gap-2.5 text-zinc-300 font-black text-[9px] uppercase tracking-[0.4em]">
-                    <Smartphone className="w-3.5 h-3.5" /> 
-                    Live Environment
-                </div>
-            </div>
+            {/* Persistence Controls (hidden when disableApi=true) */}
+            {!disableApi && (
+              <div className="mt-10 space-y-4">
+                  <Button 
+                      onClick={handleSave}
+                      disabled={isSaving}
+                      className="w-full h-16 rounded-[1.8rem] bg-zinc-900 hover:bg-black text-white font-black uppercase tracking-[0.2em] text-[11px] transition-all active:scale-95 shadow-lg disabled:opacity-70"
+                  >
+                      {isSaving ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Save className="w-4 h-4 mr-2" />
+                      )}
+                      {isSaving ? "Syncing..." : "Publish Theme"}
+                  </Button>
+                  
+                  <div className="flex items-center justify-center gap-2.5 text-zinc-300 font-black text-[9px] uppercase tracking-[0.4em]">
+                      <Smartphone className="w-3.5 h-3.5" /> 
+                      Live Environment
+                  </div>
+              </div>
+            )}
           </div>
         </div>
 
