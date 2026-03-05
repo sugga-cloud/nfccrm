@@ -226,6 +226,62 @@ export const themeRegistry = {
       card: "bg-[#0a1a05]", 
       text: "text-green-50", 
       border: "border-green-900" 
+    },
+   
+    "21": { 
+      "id": "21",
+      "name": "Electric Violet", 
+      "primary": "text-violet-400", 
+      "accent": "bg-violet-600", 
+      "accentContent": "text-white", 
+      "bg": "bg-slate-950", 
+      "card": "bg-slate-900/50", 
+      "text": "text-violet-50", 
+      "border": "border-violet-500/20" 
+    },
+    "22": { 
+      "id": "22",
+      "name": "Vintage Paper", 
+      "primary": "text-sepia-700", 
+      "accent": "bg-stone-800", 
+      "accentContent": "text-stone-100", 
+      "bg": "bg-[#f4f1ea]", 
+      "card": "bg-[#ede8df]", 
+      "text": "text-stone-900", 
+      "border": "border-stone-300" 
+    },
+    "23": { 
+      "id": "23",
+      "name": "Oceanic Abyss", 
+      "primary": "text-blue-400", 
+      "accent": "bg-blue-600", 
+      "accentContent": "text-white", 
+      "bg": "bg-[#020617]", 
+      "card": "bg-[#0f172a]", 
+      "text": "text-blue-50", 
+      "border": "border-blue-900" 
+    },
+    "24": { 
+      "id": "24",
+      "name": "Lavender Mist", 
+      "primary": "text-purple-500", 
+      "accent": "bg-purple-400", 
+      "accentContent": "text-white", 
+      "bg": "bg-purple-50/50", 
+      "card": "bg-white", 
+      "text": "text-purple-900", 
+      "border": "border-purple-100" 
+    },
+    "25": { 
+      "id": "25",
+      "name": "Burnt Charcoal", 
+      "primary": "text-orange-500", 
+      "accent": "bg-orange-600", 
+      "accentContent": "text-white", 
+      "bg": "bg-[#121212]", 
+      "card": "bg-[#1e1e1e]", 
+      "text": "text-stone-300", 
+      "border": "border-stone-800" 
     }
-  }
+    }
 };
