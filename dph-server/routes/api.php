@@ -186,6 +186,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::put('/profiles/{profile}', [AdminController::class, 'updateProfile']);  // update existing profile
     Route::delete('/profiles/{profile}', [AdminController::class, 'destroyProfile']); // delete profile
     Route::get('/profiles/{profile}', [AdminController::class, 'profileDetail']); // single profile for editing
+    Route::post('/profiles/{profile}/update-theme', [ProfileController::class, 'updateThemeAdmin']); // admin update theme/ui
     Route::get('/users', [AdminController::class, 'users']);         // For UsersTab
     Route::get('/payments', [PaymentController::class, 'payments']);   // For PaymentsTab
     Route::get('/plans', [AdminController::class, 'plans']);

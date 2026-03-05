@@ -161,6 +161,7 @@ public function storeProfile(Request $request)
         'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         'theme_id' => 'nullable|string|max:50',
+        'interface_id' => 'nullable|string|max:50',
     ];
 
     $validated = $request->validate($rules);
@@ -221,6 +222,7 @@ private function mapProfileData(Request $request, $validated)
  */
 public function updateProfile(Request $request, Profile $profile)
 {
+    \Log::info("Updating profile ID {$profile->id} with data: ", $request->all());
     $validated = $request->validate([
         'email' => 'nullable|email|unique:users,email,' . $profile->user_id,
         'username' => 'nullable|string|max:255|unique:profiles,username,' . $profile->id,
@@ -234,6 +236,7 @@ public function updateProfile(Request $request, Profile $profile)
         'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         'theme_id' => 'nullable|string|max:50',
+        'interface_id' => 'nullable|string|max:50',
     ]);
 
     return DB::transaction(function () use ($request, $validated, $profile) {

@@ -1,10 +1,10 @@
 export const themeRegistry = {
   interfaces: {
-    "1": { id: "classic", layout: "stack", spacing: "gap-0" },
-    "2": { id: "modern", layout: "grid", spacing: "gap-4 p-4" },
-    "3": { id: "glass", layout: "float", spacing: "gap-6 p-6" },
-    "4": { id: "minimal", layout: "clean", spacing: "gap-2" },
-    "5": { id: "bento", layout: "bento", spacing: "gap-3 p-3" }
+    "1": { id: "classic", spacing: "gap-0" },
+    "2": { id: "modern", spacing: "gap-4 p-4" },
+    "3": { id: "glass", spacing: "gap-6 p-6" },
+    "4": { id: "minimal", spacing: "gap-2" },
+    "5": { id: "bento", spacing: "gap-3 p-3" }
   },
   themes: {
     "1": { 

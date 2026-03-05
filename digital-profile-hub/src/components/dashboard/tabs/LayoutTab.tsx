@@ -1,218 +1,255 @@
 import React, { useState, useMemo } from "react";
-import { motion } from "framer-motion";
-import { Palette, Check, Smartphone, Save, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Palette, Check, Smartphone, Save, Loader2, 
+  Layout, Layers, MousePointer2, Sparkles, Box
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-// Import your custom axios instance
 import api from "@/api/api"; 
 import { themeRegistry } from "@/config/themeConfig"; 
 
 interface AdminProps {
   initialThemeId?: string | number;
-  onSave?: (themeId: string | number) => void;
-  /** Notify parent when theme selection changes */
-  onThemeChange?: (themeId: string | number) => void;
-  /**
-   * When true the component will skip the network request and hide the
-   * publish/save button. Useful when embedding inside another form that
-   * handles saving.
-   */
+  initialUiId?: string;
+  onSave?: (themeId: string | number, uiId: string) => void;
+  onConfigChange?: (themeId: string | number, uiId: string) => void;
   disableApi?: boolean;
+  profileId?: string;
 }
 
 const AdminThemeSelector = ({ 
   initialThemeId = "1", 
-  onSave ,disableApi = false,onThemeChange
+  initialUiId = "modern",
+  onSave, 
+  disableApi = false,
+  onConfigChange,
+  profileId=""
 }: AdminProps) => {
   
-  // 1. Setup Theme List from Registry
+  // 1. Setup Data from Registry
   const themesList = useMemo(() => Object.values(themeRegistry.themes), []);
+  const interfaces = [
+    { id: "1", name: "Classic", icon: Box, desc: "Sharp, Professional, Rigid" },
+    { id: "2", name: "Modern", icon: MousePointer2, desc: "Soft Shadows, Rounded" },
+    { id: "3", name: "Glass", icon: Layers, desc: "Frost Blur, Translucent" },
+    { id: "4", name: "Minimal", icon: Layout, desc: "Clean, Flat, Spacing-focused" },
+    { id: "5", name: "Bento", icon: Sparkles, desc: "Modular Tiles, Playful" },
+  ];
 
   // 2. State Management
   const [selectedTheme, setSelectedTheme] = useState<any>(
     themeRegistry.themes[initialThemeId as keyof typeof themeRegistry.themes] || themesList[0]
   );
+  const [selectedUi, setSelectedUi] = useState(initialUiId);
   const [isSaving, setIsSaving] = useState(false);
 
-  // keep internal selection in sync when parent supplies a different initialThemeId
+  // Sync internal state with parent props
   React.useEffect(() => {
-    console.log("initialThemeId changed", initialThemeId);
     const t = themeRegistry.themes[initialThemeId as keyof typeof themeRegistry.themes];
     if (t) setSelectedTheme(t);
-  }, [initialThemeId]);
+    if (initialUiId) setSelectedUi(initialUiId);
+  }, [initialThemeId, initialUiId]);
 
-  // 3. Save Function using your Axios Instance
+  // Notify parent of changes
+  const updateConfig = (theme: any, ui: string) => {
+    setSelectedTheme(theme);
+    setSelectedUi(ui);
+    if (onConfigChange) onConfigChange(theme.id, ui);
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
-    console.log(selectedTheme);
     try {
       if (!disableApi) {
-        const response = await api.post("/profile/update-theme", {
+        const payload: any = {
           theme_id: selectedTheme.id,
-        });
-
-        if (response.status === 200) {
-          toast.success("Theme identity updated!");
-          if (onSave) onSave(selectedTheme.id);
+          interface_id: selectedUi,
+        };
+        
+        // Determine endpoint based on context:
+        // If profileId is explicitly provided → admin endpoint
+        // Otherwise → user endpoint
+        let endpoint = "/profile/update-theme";
+        const pid = profileId || localStorage.getItem("profileId");
+        
+        if (profileId && profileId !== "") {
+          // Admin context: explicit profileId provided
+          endpoint = `/admin/profiles/${profileId}/update-theme`;
         }
-      } else {
-        // simply invoke callback, no network request
-        if (onSave) onSave(selectedTheme.id);
+
+        await api.post(endpoint, payload);
+        toast.success("Identity config updated!");
       }
+      if (onSave) onSave(selectedTheme.id, selectedUi);
     } catch (error: any) {
-      // Interceptors handle 401/403, we handle specific 422 or 500 here
-      const message = error.response?.data?.message || "Failed to update theme";
-      toast.error(message);
-      console.error("Theme Update Error:", error);
+      toast.error(error.response?.data?.message || "Failed to update configuration");
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] p-4 md:p-10 font-sans">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
+    <div className="min-h-screen bg-[#F8F8F8] p-4 md:p-10 font-sans">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
         
-        {/* LEFT: SELECTION PANEL */}
-        <div className="lg:col-span-7">
-          <header className="mb-10">
-            <h1 className="text-4xl font-black tracking-tighter uppercase italic text-zinc-900 leading-none">
-              Identity <br /> Designer
+        {/* LEFT: CONFIGURATION PANEL */}
+        <div className="lg:col-span-7 space-y-12">
+          <header>
+            <h1 className="text-5xl font-black tracking-tighter uppercase italic text-zinc-900 leading-none">
+              Brand <br /> Architect
             </h1>
             <p className="text-zinc-400 font-bold text-[10px] uppercase tracking-[0.3em] mt-4">
-              Visual Profile Configuration
+              Visual & Structural Configuration
             </p>
           </header>
 
-          <div className="flex items-center gap-3 mb-8 px-5 py-2.5 bg-zinc-100 w-fit rounded-full text-zinc-600 border border-zinc-200">
-            <Palette className="w-3.5 h-3.5" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Select Palette</span>
-          </div>
+          {/* 1. INTERFACE SELECTOR (NEW) */}
+          <section>
+            <div className="flex items-center gap-3 mb-6 px-5 py-2.5 bg-white w-fit rounded-full text-zinc-600 border border-zinc-200 shadow-sm">
+              <Layout className="w-3.5 h-3.5" />
+              <span className="text-[10px] font-black uppercase tracking-widest">1. Structural Layout</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {interfaces.map((ui) => (
+                <button
+                  key={ui.id}
+                  onClick={() => updateConfig(selectedTheme, ui.id)}
+                  className={cn(
+                    "flex flex-col p-4 rounded-3xl border-2 transition-all text-left group",
+                    selectedUi === ui.id 
+                      ? "border-zinc-900 bg-white shadow-lg" 
+                      : "border-transparent bg-zinc-200/50 hover:bg-zinc-200"
+                  )}
+                >
+                  <ui.icon className={cn("w-5 h-5 mb-3", selectedUi === ui.id ? "text-zinc-900" : "text-zinc-400")} />
+                  <p className="font-black text-[10px] uppercase tracking-tighter italic">{ui.name}</p>
+                  <p className="text-[8px] opacity-50 font-medium leading-tight mt-1">{ui.desc}</p>
+                </button>
+              ))}
+            </div>
+          </section>
 
-          <motion.div 
-            initial={{ opacity: 0, y: 15 }} 
-            animate={{ opacity: 1, y: 0 }}
-            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
-          >
-            {themesList.map((t: any) => (
-              <button
-                type="button"
-                key={t.id}
-                disabled={isSaving}
-                onClick={() => {
-                  console.log("selector clicked", t.id);
-                  setSelectedTheme(t);
-                  if (onThemeChange) {
-                    console.log("calling onThemeChange", t.id);
-                    onThemeChange(t.id);
-                  }
-                }}
-                className={cn(
-                  "group relative p-6 rounded-[2.5rem] border-2 transition-all duration-500 text-left",
-                  selectedTheme.id === t.id 
-                    ? "border-zinc-900 bg-white shadow-2xl scale-[1.02] z-10" 
-                    : "border-zinc-100 bg-white/50 hover:border-zinc-300 grayscale-[0.5] hover:grayscale-0",
-                  isSaving && "opacity-50 cursor-wait"
-                )}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center shadow-inner relative transition-transform group-hover:rotate-3", t.bg)}>
-                     <div className={cn("absolute -bottom-1 -right-1 h-6 w-6 rounded-full border-[3px] border-white shadow-sm", t.accent)} />
+          {/* 2. THEME SELECTOR */}
+          <section>
+            <div className="flex items-center gap-3 mb-6 px-5 py-2.5 bg-white w-fit rounded-full text-zinc-600 border border-zinc-200 shadow-sm">
+              <Palette className="w-3.5 h-3.5" />
+              <span className="text-[10px] font-black uppercase tracking-widest">2. Color Palette</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {themesList.map((t: any) => (
+                <button
+                  type="button"
+                  key={t.id}
+                  onClick={() => updateConfig(t, selectedUi)}
+                  className={cn(
+                    "group relative p-5 rounded-[2rem] border-2 transition-all duration-500 text-left",
+                    selectedTheme.id === t.id 
+                      ? "border-zinc-900 bg-white shadow-xl scale-[1.02]" 
+                      : "border-zinc-100 bg-white/50 hover:border-zinc-200 grayscale-[0.6] hover:grayscale-0"
+                  )}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center shadow-inner relative group-hover:rotate-3 transition-transform", t.bg)}>
+                       <div className={cn("absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-[3px] border-white shadow-sm", t.accent)} />
+                    </div>
+                    <div>
+                      <p className="font-black text-[11px] uppercase italic tracking-tighter text-zinc-900">{t.name}</p>
+                      <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-[0.2em] mt-0.5">Palette Code: {t.id}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-black text-xs uppercase italic tracking-tighter text-zinc-900">{t.name}</p>
-                    <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mt-0.5">ID: {t.id}</p>
-                  </div>
-                </div>
-                {selectedTheme.id === t.id && (
-                  <motion.div 
-                    layoutId="activeCheck"
-                    className="absolute top-5 right-5 bg-zinc-900 text-white p-1.5 rounded-full"
-                  >
-                    <Check className="w-3 h-3" />
-                  </motion.div>
-                )}
-              </button>
-            ))}
-          </motion.div>
+                  {selectedTheme.id === t.id && (
+                    <div className="absolute top-4 right-4 bg-zinc-900 text-white p-1 rounded-full">
+                      <Check className="w-3 h-3" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </section>
         </div>
 
-        {/* RIGHT: LIVE PREVIEW */}
+        {/* RIGHT: DYNAMIC PREVIEW */}
         <div className="lg:col-span-5 flex flex-col items-center">
-          <div className="sticky top-10 w-full max-w-[320px]">
-            {/* iPhone Frame */}
-            <div className="relative aspect-[9/18.5] w-full bg-zinc-900 rounded-[3.2rem] p-3 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] border-[7px] border-zinc-800">
-                {/* Dynamic Content */}
+          <div className="sticky top-10 w-full max-w-[340px]">
+            <div className="relative aspect-[9/18.5] w-full bg-zinc-900 rounded-[3.5rem] p-3 shadow-2xl border-[8px] border-zinc-800">
+                {/* Simulated Notch */}
+                <div className="absolute top-6 left-1/2 -translate-x-1/2 w-24 h-6 bg-zinc-800 rounded-full z-20" />
+                
                 <div className={cn(
-                    "w-full h-full rounded-[2.5rem] overflow-hidden transition-all duration-1000 flex flex-col relative",
+                    "w-full h-full rounded-[2.8rem] overflow-hidden transition-all duration-700 flex flex-col relative",
                     selectedTheme.bg
                 )}>
                     {/* Header Image Placeholder */}
-                    <div className="h-32 w-full bg-zinc-900/10 backdrop-blur-sm" />
+                    <div className="h-28 w-full bg-zinc-900/10 backdrop-blur-sm" />
                     
-                    <div className="flex flex-col items-center -mt-12 px-6">
-                        {/* Profile Pic Circle */}
+                    <div className={cn(
+                      "flex flex-col px-6 -mt-10 transition-all duration-500",
+                      selectedUi === "4" ? "items-start" : "items-center"
+                    )}>
+                        {/* Profile Pic */}
                         <div className={cn(
-                            "h-24 w-24 border-[5px] shadow-2xl transition-all duration-700 mb-4 rounded-full",
+                            "h-20 w-20 border-[4px] shadow-xl transition-all duration-700 mb-4",
                             selectedTheme.card,
-                            selectedTheme.border
+                            selectedTheme.border,
+                            selectedUi === "1" ? "rounded-none" : "rounded-full"
                         )} />
                         
                         {/* Name Bar */}
-                        <div className={cn("h-4 w-32 rounded-full mb-2 opacity-80", selectedTheme.text?.replace('text-', 'bg-') || "bg-zinc-800")} />
+                        <div className={cn("h-3 w-28 rounded-full mb-2 opacity-80", selectedTheme.text?.replace('text-', 'bg-') || "bg-zinc-800")} />
                         {/* Title Bar */}
-                        <div className={cn("h-2 w-20 rounded-full mb-10 opacity-30", selectedTheme.primary?.replace('text-', 'bg-') || "bg-zinc-400")} />
+                        <div className={cn("h-1.5 w-16 rounded-full mb-8 opacity-30", selectedTheme.primary?.replace('text-', 'bg-') || "bg-zinc-400")} />
                         
-                        {/* Mock Links Grid */}
-                        <div className="grid grid-cols-2 gap-3 w-full">
-                            {[1, 2, 3, 4].map(i => (
+                        {/* Mock Component Grid */}
+                        <div className={cn(
+                          "grid w-full gap-2 transition-all duration-500",
+                          selectedUi === "5" ? "grid-cols-2" : "grid-cols-1"
+                        )}>
+                            {[1, 2, 3].map(i => (
                                 <div key={i} className={cn(
-                                    "h-12 border transition-all duration-500 rounded-2xl shadow-sm",
+                                    "h-10 border transition-all duration-500 shadow-sm",
                                     selectedTheme.card,
-                                    selectedTheme.border
+                                    selectedTheme.border,
+                                    selectedUi === "3" && "backdrop-blur-md bg-white/10",
+                                    selectedUi === "1" ? "rounded-none" : "rounded-xl",
+                                    selectedUi === "5" && i === 1 ? "col-span-2 h-14" : ""
                                 )} />
                             ))}
                         </div>
                         
                         {/* Action Button */}
                         <div className={cn(
-                            "mt-10 h-12 w-full rounded-2xl shadow-xl flex items-center justify-center font-black text-[9px] tracking-[0.2em] uppercase transition-all duration-700",
+                            "mt-6 h-10 w-full shadow-lg flex items-center justify-center font-black text-[8px] tracking-[0.2em] uppercase transition-all duration-700",
                             selectedTheme.accent,
-                            selectedTheme.accentContent || "text-white"
+                            selectedTheme.accentContent || "text-white",
+                            selectedUi === "1" ? "rounded-none" : "rounded-xl"
                         )}>
-                            Contact Card
+                            Confirm Booking
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Persistence Controls (hidden when disableApi=true) */}
             {!disableApi && (
-              <div className="mt-10 space-y-4">
+              <div className="mt-8 space-y-4">
                   <Button 
                       onClick={handleSave}
                       disabled={isSaving}
-                      className="w-full h-16 rounded-[1.8rem] bg-zinc-900 hover:bg-black text-white font-black uppercase tracking-[0.2em] text-[11px] transition-all active:scale-95 shadow-lg disabled:opacity-70"
+                      className="w-full h-16 rounded-[2rem] bg-zinc-900 hover:bg-black text-white font-black uppercase tracking-[0.2em] text-[11px] shadow-xl disabled:opacity-70 transition-transform active:scale-95"
                   >
-                      {isSaving ? (
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      ) : (
-                        <Save className="w-4 h-4 mr-2" />
-                      )}
-                      {isSaving ? "Syncing..." : "Publish Theme"}
+                      {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                      {isSaving ? "Finalizing..." : "Publish Configuration"}
                   </Button>
-                  
-                  <div className="flex items-center justify-center gap-2.5 text-zinc-300 font-black text-[9px] uppercase tracking-[0.4em]">
+                  <div className="flex items-center justify-center gap-3 text-zinc-400 font-black text-[9px] uppercase tracking-[0.4em]">
                       <Smartphone className="w-3.5 h-3.5" /> 
-                      Live Environment
+                      Mobile Preview Mode
                   </div>
               </div>
             )}
           </div>
         </div>
-
       </div>
     </div>
   );

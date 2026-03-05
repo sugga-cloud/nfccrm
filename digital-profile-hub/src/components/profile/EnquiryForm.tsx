@@ -23,6 +23,17 @@ const EnquiryForm = ({ profileId, theme, ui }: EnquiryFormProps) => {
     message: "",
   });
 
+  // Layout-specific configurations
+  const layouts = {
+    classic: { card: "rounded-none", input: "rounded-none", button: "rounded-none", glass: "" },
+    modern: { card: "rounded-[3rem]", input: "rounded-2xl", button: "rounded-2xl", glass: "" },
+    glass: { card: "rounded-[2rem] backdrop-blur-xl bg-white/10 border-white/20 shadow-none", input: "rounded-xl bg-white/5 border-white/10 backdrop-blur-md", button: "rounded-xl", glass: "backdrop-blur-md" },
+    minimal: { card: "rounded-3xl border-none shadow-none bg-transparent p-0", input: "rounded-xl bg-secondary/10 border-none", button: "rounded-xl", glass: "" },
+    bento: { card: "rounded-[2.5rem]", input: "rounded-2xl", button: "rounded-2xl", glass: "" },
+  };
+
+  const style = layouts[ui.id as keyof typeof layouts] || layouts.modern;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) {
@@ -45,60 +56,56 @@ const EnquiryForm = ({ profileId, theme, ui }: EnquiryFormProps) => {
     }
   };
 
-  // Improved Input styling for theme consistency
   const inputClasses = cn(
-    "pl-11 h-12 transition-all font-medium text-sm border bg-opacity-50",
-    ui.layout === "minimal" ? "rounded-xl" : "rounded-2xl",
-    theme.card, 
-    theme.border, 
-    theme.text, 
-    "placeholder:opacity-30",
-    "focus:ring-2 focus:ring-offset-2 ring-offset-transparent outline-none",
-    // Logic to handle focus ring color safely
+    "pl-11 h-12 transition-all font-medium text-sm border",
+    style.input,
+    ui.id !== "minimal" ? theme.card : "",
+    theme.border,
+    theme.text,
+    "placeholder:opacity-30 focus:ring-2 focus:ring-offset-2 ring-offset-transparent outline-none",
     theme.name === "Pure Dark" ? "focus:ring-zinc-400" : "focus:ring-primary"
   );
 
   return (
-    <section id="enquiry" className={cn("w-full py-20 transition-colors duration-500", theme.bg)}>
+    <section id="enquiry" className={cn("w-full py-12 transition-all duration-500", theme.bg, ui.spacing)}>
       <div className="container mx-auto px-4">
         
         {/* Section Header */}
         <div className={cn(
-          "flex flex-col mb-12",
-          ui.layout === "minimal" ? "items-start text-left" : "items-center text-center"
+          "flex flex-col mb-10",
+          ui.id === "minimal" ? "items-start text-left" : "items-center text-center"
         )}>
           <div className="flex items-center gap-2 mb-2">
              <MessageSquare className={cn("h-4 w-4", theme.primary)} />
-             <span className={cn("text-[10px] font-black uppercase tracking-[0.3em] opacity-50", theme.text)}>
-               Get In Touch
+             <span className={cn("text-[10px] font-bold uppercase tracking-[0.2em] opacity-50", theme.text)}>
+                Get In Touch
              </span>
           </div>
-          <h2 className={cn("text-3xl font-black italic uppercase tracking-tighter", theme.text)}>
+          <h2 className={cn("text-2xl font-bold tracking-tight", theme.text)}>
             Send an Enquiry
           </h2>
-          <div className={cn("w-16 h-1.5 mt-3 rounded-full", theme.accent)} />
+          {ui.id !== "minimal" && <div className={cn("w-12 h-1 mt-3 rounded-full", theme.accent)} />}
         </div>
 
         <motion.div 
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="mx-auto max-w-2xl"
         >
           <div className={cn(
-            "relative border shadow-2xl overflow-hidden p-8 md:p-12 transition-all duration-500",
-            theme.card,
-            theme.border,
-            ui.layout === "minimal" ? "rounded-3xl" : "rounded-[3.5rem]"
+            "relative border transition-all duration-500",
+            ui.id !== "minimal" && "p-8 md:p-10 shadow-2xl",
+            theme.card, theme.border, style.card
           )}>
-            {/* Decorative background glow */}
-            <div className={cn("absolute -top-24 -right-24 w-48 h-48 opacity-10 blur-3xl rounded-full", theme.accent)} />
+            {/* Background decorative element - hidden on minimal */}
+            {ui.id !== "minimal" && (
+              <div className={cn("absolute -top-20 -right-20 w-40 h-40 opacity-10 blur-3xl rounded-full", theme.accent)} />
+            )}
 
-            <form className="space-y-6 relative z-10" onSubmit={handleSubmit}>
-              
-              {/* Name Field */}
+            <form className="space-y-5 relative z-10" onSubmit={handleSubmit}>
               <div className="relative group">
-                <User className={cn("absolute left-4 top-3.5 h-4 w-4 transition-opacity duration-300 opacity-30 group-focus-within:opacity-100", theme.text)} />
+                <User className={cn("absolute left-4 top-3.5 h-4 w-4 opacity-30 group-focus-within:opacity-100 transition-opacity", theme.text)} />
                 <Input 
                   className={inputClasses}
                   placeholder="Your Name" 
@@ -107,38 +114,31 @@ const EnquiryForm = ({ profileId, theme, ui }: EnquiryFormProps) => {
                 />
               </div>
 
-              {/* Grid for Phone and Email */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className={cn("grid gap-5", ui.id === "bento" ? "grid-cols-1" : "md:grid-cols-2")}>
                 <div className="relative group">
-                  <Phone className={cn("absolute left-4 top-3.5 h-4 w-4 transition-opacity duration-300 opacity-30 group-focus-within:opacity-100", theme.text)} />
+                  <Phone className={cn("absolute left-4 top-3.5 h-4 w-4 opacity-30 group-focus-within:opacity-100 transition-opacity", theme.text)} />
                   <Input 
                     className={inputClasses}
                     placeholder="Mobile Number" 
-                    type="tel" 
                     value={formData.phone}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
                   />
                 </div>
                 <div className="relative group">
-                  <Mail className={cn("absolute left-4 top-3.5 h-4 w-4 transition-opacity duration-300 opacity-30 group-focus-within:opacity-100", theme.text)} />
+                  <Mail className={cn("absolute left-4 top-3.5 h-4 w-4 opacity-30 group-focus-within:opacity-100 transition-opacity", theme.text)} />
                   <Input 
                     className={inputClasses}
                     placeholder="Email Address" 
-                    type="email" 
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                   />
                 </div>
               </div>
 
-              {/* Message Field */}
               <div className="relative group">
                 <Textarea 
-                  className={cn(
-                    inputClasses,
-                    "h-auto p-5 resize-none min-h-[140px] pl-5" // Removed icon padding for textarea for better UX
-                  )}
-                  placeholder="What's on your mind?..." 
+                  className={cn(inputClasses, "h-auto p-4 resize-none min-h-[120px] pl-4")}
+                  placeholder="How can we help you?..." 
                   value={formData.message}
                   onChange={(e) => setFormData({...formData, message: e.target.value})}
                 />
@@ -146,20 +146,17 @@ const EnquiryForm = ({ profileId, theme, ui }: EnquiryFormProps) => {
 
               <Button 
                 className={cn(
-                  "w-full h-14 font-black uppercase tracking-widest text-xs transition-all shadow-2xl group active:scale-95",
-                  theme.accent,
-                  theme.accentContent || "text-white", // Critical fix for Pure Dark
-                  ui.layout === "minimal" ? "rounded-xl" : "rounded-2xl"
+                  "w-full h-14 font-bold uppercase tracking-widest text-[10px] transition-all group active:scale-[0.98]",
+                  theme.accent, theme.accentContent || "text-white",
+                  style.button,
+                  ui.id !== "minimal" && "shadow-xl"
                 )} 
                 type="submit" 
                 disabled={loading}
               >
-                {loading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <span className="flex items-center gap-3">
-                    Submit Message
-                    <Send className="h-4 w-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (
+                  <span className="flex items-center gap-2">
+                    Submit Message <Send className="h-3.5 w-3.5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </span>
                 )}
               </Button>

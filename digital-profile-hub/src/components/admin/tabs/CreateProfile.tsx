@@ -27,6 +27,7 @@ const CreateProfile = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [profileId, setProfileId] = useState<string | null>(null);
   const [selectedThemeId, setSelectedThemeId] = useState<string | number>("1");
+  const [selectedUiId, setSelectedUiId] = useState<string>("modern");
   const navigate = useNavigate();
 
   // when editing, fetch existing profile
@@ -36,10 +37,12 @@ const CreateProfile = () => {
     if (id) {
       setIsEdit(true);
       setProfileId(id);
+      localStorage.setItem("profileId", id);
       api.get(`/admin/profiles/${id}`)
         .then((res) => {
           const p = res.data;
           if (p.theme_id) setSelectedThemeId(p.theme_id.toString());
+          if (p.interface_id) setSelectedUiId(p.interface_id);
           // map basic fields
           setForm((prev) => ({
             ...prev,
@@ -207,12 +210,17 @@ const CreateProfile = () => {
     try {
       const url = isEdit && profileId ? `/admin/profiles/${profileId}` : "/admin/profiles";
       const method = isEdit ? api.put : api.post;
-      // debug: theme before sending
-      console.log("submitting themeId", selectedThemeId);
-      // include theme selection in the submission
+      console.log(url)
+      data.append('_method', 'PUT'); // Add this!
+      // include theme & ui selection in the submission
       if (selectedThemeId) data.append("theme_id", String(selectedThemeId));
-
-      const res = await method(url, data, {
+      if (selectedUiId) data.append("interface_id", String(selectedUiId));
+      console.log("Submitting data:", {
+        ...form,
+        theme_id: selectedThemeId,
+        interface_id: selectedUiId
+      });
+      const res = await api.post(url, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success(isEdit ? "Profile updated successfully" : "Profile created successfully");
@@ -226,6 +234,7 @@ const CreateProfile = () => {
         }
       }
       if (!isEdit) {
+        localStorage.removeItem("profileId");
         setForm({
           email: "",
           username: "",
@@ -240,6 +249,8 @@ const CreateProfile = () => {
           profile_image: null,
           cover_image: null,
         });
+        setSelectedThemeId("1");
+        setSelectedUiId("modern");
         setHours([...hours].map(h => ({...h, open:'',close:'',isOpen:false}))); // reset if needed
         setLinks([]);
         setGalleryFiles([]);
@@ -270,15 +281,20 @@ const CreateProfile = () => {
         <Card className="mb-6">
           <CardContent className="space-y-4 p-6">
             {/* debug display current theme selection */}
-            <div className="text-sm text-gray-500 mb-2">Selected theme: {selectedThemeId}</div>
-            {/* Theme selector (embedded, API disabled here) */}
+            <div className="text-sm text-gray-500 mb-2">Selected theme: {selectedThemeId}, ui: {selectedUiId}</div>
+            {/* Theme+UI selector (embedded, API disabled here) */}
             <div className="pt-2 pb-4">
               <h3 className="text-sm font-semibold mb-2">Profile Theme</h3>
               <div className="border rounded p-2">
                 <AdminThemeSelector
                   initialThemeId={selectedThemeId}
-                  onThemeChange={(id) => setSelectedThemeId(String(id))}
-                  disableApi={true}
+                  initialUiId={selectedUiId}
+                  profileId={profileId || ""}
+                  onConfigChange={(theme, ui) => {
+                    setSelectedThemeId(String(theme));
+                    setSelectedUiId(ui);
+                  }}
+                  disableApi={true} /* parent handles saving */
                 />
               </div>
             </div>

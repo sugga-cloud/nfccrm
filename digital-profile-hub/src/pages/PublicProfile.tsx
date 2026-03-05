@@ -42,7 +42,7 @@ const PublicProfile = () => {
   const ui = themeRegistry.interfaces[activeInterfaceId as keyof typeof themeRegistry.interfaces] 
              || themeRegistry.interfaces["1"];
   // Helper for layout wrapping
-  const layoutWrapperClass = ui.layout === "grid" ? "grid grid-cols-2 gap-4 p-4" : "flex flex-col w-full";
+  const layoutWrapperClass = ui.spacing;
 
   useEffect(() => {
     const fetchFullProfile = async () => {
@@ -50,6 +50,7 @@ const PublicProfile = () => {
         setLoading(true);
         const response = await api.get(`/profile/${username}`);
         const actualData = response.data.data || response.data;
+        console.log(actualData)
         setProfileData(actualData);
 
         if (actualData?.id) localStorage.setItem(`profileId`, actualData.id.toString());
