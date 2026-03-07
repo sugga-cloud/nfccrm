@@ -4,6 +4,7 @@ import api from "@/api/api";
 import { themeRegistry } from "@/config/themeConfig";
 
 // Components
+import TermsLegalSection from "@/components/profile/TnC";
 import MainLayout from "@/components/layout/MainLayout";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ServicesSection from "@/components/profile/ServicesSection";
@@ -17,7 +18,7 @@ import BottomContactBar from "@/components/profile/BottomContactBar";
 import MapSection from "@/components/profile/MapSection";
 import QRSection from "@/components/profile/QRSection";
 import CartFloatingButton from "@/components/layout/CartFloatingButton";
-
+import TestimonialSection from "@/components/profile/TestimonialSection";
 // UI/Icons
 import { Separator } from "@/components/ui/separator";
 import { Loader2, AlertTriangle } from "lucide-react";
@@ -114,9 +115,10 @@ const PublicProfile = () => {
             <EnquiryForm profileId={profileData.id} theme={theme}  ui={ui}/>
           </div>
         </div>
-
+        <TestimonialSection testimonials={profileData.testimonials} theme={theme}  ui={ui}/>
         <MapSection profile={profileData} theme={theme}  ui={ui}/>
-        
+
+        <TermsLegalSection data={profileData.legal_documents} theme={theme} ui={ui}/>
         <CartFloatingButton/>
         <BottomContactBar profile={profileData} theme={theme}  ui={ui}/>
       </div>

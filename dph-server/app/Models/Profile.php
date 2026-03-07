@@ -68,5 +68,14 @@ class Profile extends Model
     public function storage(){
         return $this->hasOne(StorageUsage::class);
     }
+
+    public function testimonials()
+    {
+        return $this->hasMany(Testimonial::class);
+    }
+    public function legalDocuments()
+{
+    return $this->hasMany(LegalDocument::class);
+}
 }
 

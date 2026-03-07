@@ -29,7 +29,11 @@ class ProfileController extends Controller
             'businessHours',
             'analytics',
             'user',
-            'sociallinks'
+            'sociallinks',
+            'testimonials' => function ($query) {
+                $query->where('is_visible', true)->orderBy('created_at', 'desc');
+            },
+            'legalDocuments'
         ])
         ->first();
 
@@ -223,49 +227,52 @@ if ($activeSubscription) {
     /** * SOCIAL LINKS LOGIC (Separate Table)
      */
     public function getSocialLinks()
-    {
-        $profile = Auth::user()->profile;
-        // Returns: ["instagram" => "url", "facebook" => "url"]
-        return response()->json(
-            $profile->socialLinks()->pluck('url', 'platform')
-        );
-    }
+{
+    $links = Auth::user()->profile->socialLinks;
 
-    public function updateSocialLinks(Request $request)
-    {
-        $request->validate([
-            'links' => 'required|array', // Expects: {"instagram": "url", "twitter": "url"}
-        ]);
+    // Transform [{platform: 'insta', url: '...'}] -> {"insta": "..."}
+    $formattedLinks = $links->pluck('url', 'platform')->toArray();
 
-        $profile = Auth::user()->profile;
+    return response()->json($formattedLinks);
+}
 
-        // Start a transaction for safety
-        \DB::transaction(function () use ($profile, $request) {
-            // 1. Remove existing links to start fresh
-            $profile->socialLinks()->delete();
+ public function updateSocialLinks(Request $request)
+{
+    // Use 'present' so it's okay to send an empty array/object
+    // but the 'links' key must exist in the request
+    $request->validate([
+        'links' => 'present|array', 
+    ]);
 
-            // 2. Filter out empty URLs and prepare new data
-            $newLinks = [];
-            foreach ($request->links as $platform => $url) {
-                if (!empty($url)) {
-                    $newLinks[] = [
-                        'profile_id' => $profile->id,
-                        'platform'   => $platform,
-                        'url'        => $url,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
+    $profile = Auth::user()->profile;
+
+    return \DB::transaction(function () use ($profile, $request) {
+        // 1. Delete existing
+        $profile->socialLinks()->delete();
+
+        // 2. Map the Key-Value object to Database format
+        $newLinks = [];
+        foreach ($request->links as $platform => $url) {
+            // Only add if URL is actually provided
+            if (!empty($url) && is_string($url)) {
+                $newLinks[] = [
+                    'profile_id' => $profile->id,
+                    'platform'   => $platform,
+                    'url'        => $url,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
             }
+        }
 
-            // 3. Mass insert
-            if (count($newLinks) > 0) {
-                SocialLink::insert($newLinks);
-            }
-        });
+        // 3. Mass insert if we have data
+        if (count($newLinks) > 0) {
+            \App\Models\SocialLink::insert($newLinks);
+        }
 
         return response()->json(['message' => 'Social links synchronized successfully.']);
-    }
+    });
+}
 
     /**
      * Update Profile Theme (User own profile)

@@ -107,7 +107,7 @@ const AdminThemeSelector = ({
           </header>
 
           {/* 1. INTERFACE SELECTOR (NEW) */}
-          <section>
+          {/* <section>
             <div className="flex items-center gap-3 mb-6 px-5 py-2.5 bg-white w-fit rounded-full text-zinc-600 border border-zinc-200 shadow-sm">
               <Layout className="w-3.5 h-3.5" />
               <span className="text-[10px] font-black uppercase tracking-widest">1. Structural Layout</span>
@@ -130,13 +130,13 @@ const AdminThemeSelector = ({
                 </button>
               ))}
             </div>
-          </section>
+          </section> */}
 
           {/* 2. THEME SELECTOR */}
           <section>
             <div className="flex items-center gap-3 mb-6 px-5 py-2.5 bg-white w-fit rounded-full text-zinc-600 border border-zinc-200 shadow-sm">
               <Palette className="w-3.5 h-3.5" />
-              <span className="text-[10px] font-black uppercase tracking-widest">2. Color Palette</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">1. Color Palette</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {themesList.map((t: any) => (

@@ -19,10 +19,12 @@ const Index = () => (
         <Zap className="mr-2 h-4 w-4" />
         <span>Future of Networking</span>
       </div>
-      <h1 className="text-4xl font-black italic tracking-tighter sm:text-6xl uppercase text-slate-900 leading-[0.9]">
-        Your Digital Identity, <br />
-        <span className="text-orange-500">One Tap Away</span>
-      </h1>
+    <h1 className="text-4xl font-black italic tracking-tighter sm:text-6xl uppercase text-slate-900 leading-[0.9]">
+  Your Digital Identity, <br />
+  <span className="text-orange-600 font-serif italic font-medium normal-case tracking-tight">
+    One Tap Away
+  </span>
+</h1>
       <p className="mt-6 max-w-2xl text-lg text-slate-500 font-medium">
         Replace physical visiting cards with a high-performance <strong>Mini Website + Portfolio + Store</strong>. 
         Share instantly via NFC tap or auto-generated QR codes.

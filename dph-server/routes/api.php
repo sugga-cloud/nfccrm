@@ -10,7 +10,9 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\EnquiryController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\LegalController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\TestimonialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,85 +42,6 @@ Route::get('/products/{id}', [ProductController::class, 'show']);
 Route::get('/plans/{id}', [AdminController::class, 'planDetail']);
 Route::post('/enquire',[EnquiryController::class, 'store']);
 Route::post('/take-appointment',[AppointmentController::class, 'store']);
-// Route::middleware('auth:sanctum','subscribed')->group(function () {
-//     Route::get('/user/current-subscription', [PaymentController::class, 'getCurrentSubscription']);
-//     // Current User
-//     Route::get('/user', function () {
-//         return response()->json(auth()->user());
-//         });
-        
-//     Route::post('/logout', [AuthController::class, 'logout']);
-//     // Fetch a single plan by ID
-//     /*
-//     |--------------------------------------------------------------------------
-//     | Profile
-//     |--------------------------------------------------------------------------
-//     */
-//     Route::get('/my-profile', [ProfileController::class, 'myProfile']);
-//     Route::put('/my-profile', [ProfileController::class, 'update']);
-    
-//     /*
-//     |--------------------------------------------------------------------------
-//     | Services
-//     |--------------------------------------------------------------------------
-//     */
-//     Route::apiResource('services', ServiceController::class);
-
-//     /*
-//     |--------------------------------------------------------------------------
-//     | Products
-//     |--------------------------------------------------------------------------
-//     */
-//     Route::apiResource('products', ProductController::class);
-    
-//     /*
-//     |--------------------------------------------------------------------------
-//     | Blogs
-//     |--------------------------------------------------------------------------
-//     */
-//     Route::apiResource('blogs', BlogController::class);
-    
-//     /*
-//     |--------------------------------------------------------------------------
-//     | Gallery
-//     |--------------------------------------------------------------------------
-//     */
-//     Route::apiResource('gallery', GalleryController::class);
-// // We use a POST for upload even if it's "adding" because of multi-part file support
-//     Route::get('/gallery', [GalleryController::class, 'index']);
-//     Route::post('/gallery/upload', [GalleryController::class, 'store']); 
-//     Route::delete('/gallery/{id}', [GalleryController::class, 'destroy']);
-//     /*
-//     |--------------------------------------------------------------------------
-//     | Appointments
-//     |--------------------------------------------------------------------------
-//     */
-//     Route::apiResource('appointments', AppointmentController::class);
-    
-//     /*
-//     |--------------------------------------------------------------------------
-//     | Enquiries
-//     |--------------------------------------------------------------------------
-//     */
-//     Route::apiResource('enquiries', EnquiryController::class);
-
-//     // Business Hours Routes
-//     Route::get('/profile/hours', [ProfileController::class, 'getHours']);
-//     Route::post('/profile/hours', [ProfileController::class, 'updateHours']);
-
-//     // Social Links Routes
-//     Route::get('/profile/social-links', [ProfileController::class, 'getSocialLinks']);
-//     Route::post('/profile/social-links', [ProfileController::class, 'updateSocialLinks']);
-//     Route::get('/products', [ProductController::class, 'index']);
-//     Route::post('/payments/create-order', [PaymentController::class, 'createOrder']);
-//     Route::post('/payments/verify', [PaymentController::class, 'verifyPayment']);
-// });
-/*
-|--------------------------------------------------------------------------
-| 1. BASIC AUTH ROUTES (Accessible even if subscription expired)
-|--------------------------------------------------------------------------
-| Users can still logout, view their profile, and PAY for a new plan here.
-*/
 Route::middleware('auth:sanctum','is_active')->group(function () {
     
     // Auth & Basic Info
@@ -169,6 +92,13 @@ Route::middleware('auth:sanctum','is_active')->group(function () {
         Route::get('/profile/social-links', [ProfileController::class, 'getSocialLinks']);
         Route::post('/profile/social-links', [ProfileController::class, 'updateSocialLinks']);
         Route::post('/profile/update-theme', [ProfileController::class, 'updateTheme']);
+        Route::get('/my-testimonials', [TestimonialController::class, 'index']);
+        Route::post('/testimonials', [TestimonialController::class, 'store']); // <--- Add this
+        Route::patch('/testimonials/{testimonial}', [TestimonialController::class, 'update']);
+        Route::delete('/testimonials/{testimonial}', [TestimonialController::class, 'destroy']);
+        Route::get('/profile/terms', [LegalController::class, 'getTerms']);
+        Route::post('/profile/terms', [LegalController::class, 'updateTerms']);
+
     });
 });
 

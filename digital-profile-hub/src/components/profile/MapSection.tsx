@@ -134,23 +134,6 @@ const MapSection = ({ profile, theme, ui }: MapSectionProps) => {
             </div>
           </div>
         </div>
-
-        {/* --- GOOGLE REVIEW BUTTON --- */}
-        <Button 
-          onClick={() => window.open(googleReviewUrl, '_blank')}
-          className={cn(
-            "w-full h-16 rounded-2xl font-black uppercase tracking-[0.2em] text-xs gap-3 transition-all shadow-xl hover:scale-[1.02] active:scale-95",
-            theme.card,
-            theme.border,
-            theme.text
-          )}
-        >
-          <div className="flex items-center justify-center h-8 w-8 rounded-full bg-yellow-400 text-white shadow-inner">
-            <Star className="h-4 w-4 fill-current" />
-          </div>
-          Review us on Google
-        </Button>
-
       </div>
     </section>
   );

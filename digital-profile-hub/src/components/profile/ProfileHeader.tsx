@@ -89,17 +89,76 @@ const ProfileHeader = ({ data, theme, ui }: ProfileHeaderProps) => {
 
   const style = layouts[ui.id as keyof typeof layouts] || layouts.modern;
 
-  const downloadVCard = () => {
-    const vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${data.user?.full_name || 'Contact'}\nORG:${data.company_name}\nTITLE:${data.designation}\nTEL;TYPE=CELL:${data.phone || ''}\nEMAIL:${data.email || ''}\nURL:${data.website || ''}\nEND:VCARD`;
-    const blob = new Blob([vcard], { type: "text/vcard" });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `${data.user?.full_name.replace(/\s+/g, '_')}.vcf`);
-    link.click();
-    toast.success("Contact ready to save!");
-  };
+ const downloadVCard = () => {
+  const fullName = data.user?.full_name || 'Contact';
+  let profile: any = data;
+  profile.links = data.sociallinks || []; // Handle both naming conventions from backend
+  // Start with standard headers
+  let vcard = [
+    "BEGIN:VCARD",
+    "VERSION:3.0",
+    `FN:${fullName}`,
+    `ORG:${profile.business_name || ''}`,
+    `TITLE:${profile.job_title || ''}`,
+    `TEL;TYPE=CELL,VOICE:${profile.phone || ''}`,
+    `EMAIL;TYPE=INTERNET,WORK:${profile.user?.email || ''}`,
+  ];
 
+  // Add Google Maps Location
+  if (profile.google_map_link) {
+    vcard.push(`URL;TYPE=LOCATION:${profile.google_map_link}`);
+  }
+
+  // Add Personal Website
+  if (profile.website) {
+    vcard.push(`URL;TYPE=WORK:${profile.website}`);
+  }
+
+  // Prepare a "Notes" backup for manual visibility
+  const notesLine: string[] = ["--- DIGITAL PROFILE LINKS ---"];
+
+  // Process the Dynamic Links Array
+  if (profile.links && Array.isArray(profile.links)) {
+    profile.links.forEach((link: any) => {
+      const rawPlatform = (link.platform || 'Link').toLowerCase();
+      const url = link.url;
+      
+      // Fix common typos for the label
+      const platform = rawPlatform === "webste" ? "website" : rawPlatform;
+      
+      // 1. Add to the Notes section (This is visible on EVERY phone)
+      notesLine.push(`${platform.toUpperCase()}: ${url}`);
+
+      // 2. Add as an official Social Profile (For iOS/Android Integration)
+      const socialPlatforms = ['facebook', 'instagram', 'twitter', 'linkedin', 'github', 'youtube'];
+      
+      if (socialPlatforms.includes(platform)) {
+        // Format: X-SOCIALPROFILE;TYPE=facebook:https://facebook.com/user
+        vcard.push(`X-SOCIALPROFILE;TYPE=${platform}:${url}`);
+      } else {
+        // Fallback for custom links
+        vcard.push(`URL;TYPE=${platform.toUpperCase()}:${url}`);
+      }
+    });
+  }
+
+  // Finalizing the Notes (must escape newlines with \\n)
+  vcard.push(`NOTE:${notesLine.join("\\n")}`);
+  vcard.push("END:VCARD");
+
+  // Trigger the Download
+  const vcardString = vcard.join("\n");
+  const blob = new Blob([vcardString], { type: "text/vcard;charset=utf-8" });
+  const downloadUrl = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = downloadUrl;
+  link.setAttribute("download", `${fullName.replace(/\s+/g, '_')}.vcf`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  toast.success("Contact with all social links exported!");
+};
   const handleAction = async (url: string | undefined, type: string) => {
     if (!url || url.trim() === "" || url.includes('undefined')) {
       toast.error(`No ${type} link provided`);
