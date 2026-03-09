@@ -168,7 +168,7 @@ const BusinessHoursTab = () => {
                       value={item.open} 
                       disabled={!item.isOpen || !isEditing}
                       onChange={(e) => updateDay(idx, "open", e.target.value)} 
-                      className="pl-10 h-10 rounded-xl border-white/10 bg-white/5 focus-visible:ring-brand-gold disabled:opacity-100 disabled:bg-white/5 disabled:text-white font-medium"
+                      className="pl-10 h-10 rounded-xl border-white/10 bg-white/5 focus-visible:ring-brand-gold disabled:opacity-100 disabled:bg-white/5 text-white disabled:text-white font-medium"
                     />
                   </div>
                   
@@ -184,7 +184,7 @@ const BusinessHoursTab = () => {
                       value={item.close} 
                       disabled={!item.isOpen || !isEditing}
                       onChange={(e) => updateDay(idx, "close", e.target.value)} 
-                      className="pl-10 h-10 rounded-xl border-white/10 bg-white/5 focus-visible:ring-brand-gold disabled:opacity-100 disabled:bg-white/5 disabled:text-white font-medium"
+                      className="pl-10 h-10 rounded-xl border-white/10 bg-white/5 focus-visible:ring-brand-gold disabled:opacity-100 disabled:bg-white/5 text-white disabled:text-white font-medium"
                     />
                   </div>
                 </div>
