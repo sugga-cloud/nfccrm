@@ -72,13 +72,14 @@ const PlanDetail = () => {
             toast.success("Identity Verified! Subscription Active.");
             navigate("/dashboard");
           } catch (err) {
-            toast.error("Verification failed. Please contact support.");
+            console.log(err.response?.data?.message);
+            toast.error(err.response?.data?.message || "Verification failed. Please contact support.");
           }
         },
         // prefill should ideally come from your Auth user state
         prefill: { 
             name: "Sazid Husain", // Replace with dynamic data
-            email: "sazid@example.com" 
+            email: "sazidhusain2004@example.com" 
         },
         theme: { color: "#D4AF37" }, 
       };

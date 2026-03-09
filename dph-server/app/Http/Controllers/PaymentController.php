@@ -174,41 +174,49 @@ public function handleWebhook(Request $request) {
  * Helper to ensure the subscription is active even if frontend fails
  */private function activateSubscriptionByOrderId($orderId, $paymentId) {
     return DB::transaction(function () use ($orderId, $paymentId) {
-        // 1. Find the pending subscription created during 'createOrder'
+        // 1. Fetch the subscription AND the plan explicitly
         $subscription = Subscription::where('razorpay_order_id', $orderId)
                                     ->where('status', 'pending')
-                                    ->with('plan')
                                     ->first();
 
-        if (!$subscription) return;
+        // 2. Safety Check: Does the subscription exist?
+        if (!$subscription) {
+            \Log::error("Webhook Error: No pending subscription found for Order ID: $orderId");
+            return;
+        }
 
-        // 2. Check if the user ALREADY has an active plan
+        // 3. Safety Check: Does the plan still exist?
+        $plan = SubscriptionPlan::find($subscription->plan_id);
+        if (!$plan) {
+            \Log::error("Webhook Error: Plan ID {$subscription->plan_id} not found for Subscription ID: {$subscription->id}");
+            return;
+        }
+
+        // 4. Stacking Logic
         $latestActiveSub = Subscription::where('user_id', $subscription->user_id)
                                         ->where('status', 'active')
                                         ->orderBy('end_date', 'desc')
                                         ->first();
 
-        // 3. Determine the Start Date
-        // If they have an active plan, start AFTER it ends. 
-        // If not, start NOW.
         $newStartDate = ($latestActiveSub && $latestActiveSub->end_date > now()) 
                         ? Carbon::parse($latestActiveSub->end_date) 
                         : Carbon::now();
 
-        // 4. Update the pending subscription to active with the new dates
+        // 5. Use the $plan variable directly to avoid relationship null errors
         $subscription->update([
             'start_date' => $newStartDate,
-            'end_date'   => $newStartDate->copy()->addDays($subscription->plan->duration),
-            'status'     => 'active'
+            'end_date'   => $newStartDate->copy()->addDays($plan->duration), // Fixed
+            'status'     => 'active',
+            'auto_renew' => true
         ]);
 
-        // 5. Record the Payment (using firstOrCreate to prevent duplicates from Webhook vs Frontend)
+        // 6. Record Payment
         Payment::firstOrCreate(
             ['transaction_id' => $paymentId],
             [
                 'user_id' => $subscription->user_id,
                 'subscription_id' => $subscription->id,
-                'amount' => $subscription->plan->price,
+                'amount' => $plan->price,
                 'payment_method' => 'razorpay',
                 'status' => 'success'
             ]

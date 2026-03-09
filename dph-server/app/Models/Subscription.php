@@ -20,16 +20,9 @@ class Subscription extends Model
     }
 
     public function plan()
-    {
-        return $this->hasOneThrough(
-            SubscriptionPlan::class, 
-            Subscription::class, 
-            'id', // Foreign key on subscriptions table
-            'id', // Foreign key on subscription_plans table
-            'subscription_id', // Local key on payments table
-            'plan_id' // Local key on subscriptions table
-        );
-    }
+{
+    return $this->belongsTo(SubscriptionPlan::class, 'plan_id');
+}
 
     public function payments()
     {
