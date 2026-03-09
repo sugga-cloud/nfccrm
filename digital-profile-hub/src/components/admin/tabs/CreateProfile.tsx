@@ -312,8 +312,7 @@ const CreateProfile = () => {
 
     try {
       const url = isEdit && profileId ? `/admin/profiles/${profileId}` : "/admin/profiles";
-      const method = isEdit ? api.put : api.post;
-      console.log(url)
+      const method = "POST";
       data.append('_method', 'PUT'); // Add this!
       // include theme & ui selection in the submission
       if (selectedThemeId) data.append("theme_id", String(selectedThemeId));

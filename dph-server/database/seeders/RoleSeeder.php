@@ -21,6 +21,7 @@ class RoleSeeder extends Seeder
     // ]);
 
         \App\Models\Role::create([
+        'id'=>3,
         'name' => 'staff',
     ]);
     }
