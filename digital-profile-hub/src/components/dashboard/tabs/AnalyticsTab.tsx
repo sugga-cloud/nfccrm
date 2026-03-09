@@ -9,143 +9,145 @@ import {
 import { 
   RefreshCw, TrendingUp, MousePointer2, 
   CalendarCheck, MessageSquare, HardDrive, 
-  ArrowUpRight, AlertCircle 
+  ArrowUpRight, AlertCircle, Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import SubscriptionCard from "./SubscriptionCard";
+
 const AnalyticsTab = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  
   const { data, isLoading, isFetching, error, refetch } = useQuery({
     queryKey: ["profileAnalytics"],
     queryFn: async () => {
-      try {
-        const res = await api.get("/my-profile");
-        // We return the whole res.data so we can access .storage and .analytics
-        console.log(res.data);
-        return res.data;
-      } catch (er: any) {
-        console.error("Backend Error:", er.response?.data?.message || er.message);
-        throw er.response?.data || new Error("Network Error");
-      }
+      const res = await api.get("/my-profile");
+      return res.data;
     },
     staleTime: 1000 * 60 * 5,
   });
 
   if (isLoading) return (
-    <div className="flex h-64 flex-col items-center justify-center text-orange-500 gap-4">
-      <RefreshCw className="h-8 w-8 animate-spin" />
-      <span className="font-black italic uppercase tracking-widest text-xs">Gathering Insights...</span>
+    <div className="flex h-96 flex-col items-center justify-center gap-6 bg-brand-dark rounded-[3rem] border border-white/5">
+      <div className="relative">
+        <RefreshCw className="h-12 w-12 animate-spin text-brand-gold" />
+        <Zap className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-4 w-4 text-white" />
+      </div>
+      <p className="font-black italic uppercase tracking-[0.4em] text-[10px] text-slate-500">Decrypting Analytics...</p>
     </div>
   );
 
   if (error) return (
-    <div className="p-8 bg-red-50 rounded-[2rem] border border-red-100 text-red-600 flex items-center gap-3">
-      <AlertCircle className="h-5 w-5" />
-      <span className="font-bold">Failed to load analytics. Please try again later.</span>
+    <div className="p-10 bg-red-500/5 rounded-[3rem] border border-red-500/20 text-red-400 flex flex-col items-center gap-4 text-center">
+      <AlertCircle className="h-10 w-10 text-red-500" />
+      <div className="space-y-1">
+        <h3 className="font-black uppercase tracking-tighter text-xl">Data Sync Interrupted</h3>
+        <p className="text-xs font-bold uppercase tracking-widest opacity-60">System could not retrieve performance metrics.</p>
+      </div>
+      <Button onClick={() => refetch()} variant="outline" className="mt-4 border-red-500/30 hover:bg-red-500/10 text-red-400 font-black uppercase tracking-widest text-[10px] rounded-xl">
+        Attempt Reconnection
+      </Button>
     </div>
   );
 
   // --- DATA PROCESSING ---
   const stats = data?.analytics || {};
   const storage = data?.storage || {};
-  const plan = data.plan || {};
-  // Storage Logic: Handling your -1.81MB glitch and calculating percentage
-  const limitMb = plan.limit; // Starter Plan Limit
+  const plan = data?.plan || { name: "Basic", limit: 10 };
+
+  const limitMb = plan.limit;
   const rawUsedMb = parseFloat(storage.used_space_mb || 0);
-  const usedMb = rawUsedMb < 0 ? 0 : rawUsedMb; // Floor at 0
+  const usedMb = rawUsedMb < 0 ? 0 : rawUsedMb; 
   const storagePercentage = Math.min((usedMb / limitMb) * 100, 100);
 
   const chartData = [
-    { name: "Visits", value: stats.visit_count || 0, icon: TrendingUp, color: "#f97316" },
-    { name: "Clicks", value: stats.click_count || 0, icon: MousePointer2, color: "#fb923c" },
-    { name: "Bookings", value: stats.appointment_count || 0, icon: CalendarCheck, color: "#ea580c" },
-    { name: "Enquiries", value: stats.enquiry_count || 0, icon: MessageSquare, color: "#c2410c" },
+    { name: "Visits", value: stats.visit_count || 0, color: "#D4AF37" },
+    { name: "Clicks", value: stats.click_count || 0, color: "#94a3b8" },
+    { name: "Bookings", value: stats.appointment_count || 0, color: "#f97316" },
+    { name: "Enquiries", value: stats.enquiry_count || 0, color: "#ffffff" },
   ];
 
   return (
-    <div className="space-y-8 p-2 md:p-4">
+    <div className="space-y-10 p-2 animate-in fade-in duration-700">
       <SubscriptionCard />
+
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-black italic tracking-tighter uppercase text-slate-900">
-            Performance <span className="text-orange-500">Overview</span>
+          <h1 className="text-5xl font-black italic tracking-tighter uppercase text-white">
+            Performance <span className="text-brand-gold">Intelligence</span>
           </h1>
-          <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-1">
-            Real-time engagement and resource tracking
+          <p className="text-slate-500 font-black text-[10px] uppercase tracking-[0.3em] mt-2">
+            Asset Monitoring & Engagement Metrics
           </p>
         </div>
         <Button 
           variant="outline" 
           onClick={() => refetch()} 
           disabled={isFetching}
-          className="rounded-2xl border-slate-200 font-bold uppercase tracking-widest text-[10px] h-12 px-6 shadow-sm hover:bg-orange-50 hover:text-orange-600 transition-all"
+          className="rounded-2xl border-white/10 font-black uppercase tracking-[0.2em] text-[10px] h-14 px-8 bg-white/[0.03] backdrop-blur-xl hover:bg-brand-gold/10 hover:text-brand-gold transition-all shadow-2xl"
         >
-          <RefreshCw className={cn("mr-2 h-3 w-3", isFetching && "animate-spin")} />
-          {isFetching ? "Syncing..." : "Refresh Data"}
+          <RefreshCw className={cn("mr-3 h-4 w-4", isFetching && "animate-spin")} />
+          {isFetching ? "Syncing Dossier..." : "Sync Intelligence"}
         </Button>
       </div>
 
-      {/* 1. Storage Usage Card (Modern High-Contrast) */}
+      {/* 1. Storage Usage Card */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 p-8 shadow-2xl"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="relative overflow-hidden rounded-[3rem] bg-gradient-to-br from-slate-900 via-brand-dark to-brand-dark p-10 border border-white/10 shadow-[0_40px_80px_rgba(0,0,0,0.5)]"
       >
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-          <div className="flex items-center gap-5">
-            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-orange-500 shadow-lg shadow-orange-500/20">
-              <HardDrive className="h-8 w-8 text-white" />
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-10">
+          <div className="flex items-center gap-6">
+            <div className="flex h-20 w-20 items-center justify-center rounded-[2rem] bg-brand-gold shadow-[0_0_30px_rgba(212,175,55,0.3)]">
+              <HardDrive className="h-10 w-10 text-brand-dark" />
             </div>
             <div>
-              <h2 className="text-2xl font-black italic uppercase tracking-tighter text-white">
-                Cloud <span className="text-orange-500">Storage</span>
+              <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white leading-none">
+                Vault <span className="text-brand-gold">Capacity</span>
               </h2>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{plan.name}</span>
-                <span className="h-1 w-1 rounded-full bg-slate-700" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">{plan.limit}MB Total</span>
+              <div className="flex items-center gap-3 mt-3">
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">{plan.name} Tier</span>
+                <div className="h-1 w-1 rounded-full bg-brand-gold/40" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-gold">{plan.limit}MB Allocated</span>
               </div>
             </div>
           </div>
 
           <div className="flex-1 max-w-xl">
-            <div className="flex justify-between items-end mb-3">
+            <div className="flex justify-between items-end mb-4">
               <div className="flex flex-col">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Current Usage</span>
-                <span className="text-xl font-black text-white">{usedMb.toFixed(2)} <span className="text-sm text-slate-500">MB</span></span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Encrypted Storage Used</span>
+                <span className="text-3xl font-black text-white italic tracking-tighter">{usedMb.toFixed(2)} <span className="text-sm text-slate-500 not-italic tracking-normal">MB</span></span>
               </div>
               <span className={cn(
-                "text-xs font-black px-3 py-1 rounded-lg",
-                storagePercentage > 80 ? "bg-red-500/10 text-red-500" : "bg-orange-500/10 text-orange-500"
+                "text-[10px] font-black px-4 py-2 rounded-xl border tracking-widest",
+                storagePercentage > 80 ? "bg-red-500/10 border-red-500/20 text-red-500" : "bg-brand-gold/10 border-brand-gold/20 text-brand-gold"
               )}>
-                {storagePercentage.toFixed(1)}% USED
+                {storagePercentage.toFixed(1)}% OCCUPIED
               </span>
             </div>
-            <div className="h-4 w-full bg-slate-800 rounded-full overflow-hidden border border-slate-700/50 p-1">
+            <div className="h-5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-1 backdrop-blur-md">
               <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: `${storagePercentage}%` }}
                 transition={{ duration: 1.5, ease: "circOut" }}
                 className={cn(
-                  "h-full rounded-full transition-colors duration-500",
-                  storagePercentage > 90 ? "bg-red-500" : "bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]"
+                  "h-full rounded-full transition-all duration-1000",
+                  storagePercentage > 90 ? "bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.4)]" : "bg-gradient-to-r from-brand-gold to-yellow-200 shadow-[0_0_20px_rgba(212,175,55,0.4)]"
                 )}
               />
             </div>
           </div>
 
-          <Button onClick={()=>navigate('/pricing')} className="rounded-2xl bg-white text-slate-900 hover:bg-orange-500 hover:text-white font-black italic uppercase tracking-tighter px-8 h-14 transition-all">
-            Upgrade Plan <ArrowUpRight className="ml-2 h-4 w-4" />
+          <Button onClick={()=>navigate('/pricing')} className="btn-gold rounded-2xl px-10 h-16 font-black uppercase tracking-widest text-[10px] shadow-2xl hover:scale-105 active:scale-95 transition-all">
+            Expand Capacity <ArrowUpRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
-        
-        {/* Decorative background element */}
-        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-orange-500/5 blur-[100px]" />
       </motion.div>
 
       {/* 2. Engagement Stats Grid */}
@@ -157,24 +159,22 @@ const AnalyticsTab = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1 }}
           >
-            <Card className="overflow-hidden border-none shadow-xl ring-1 ring-slate-100 hover:ring-orange-200 transition-all group">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+            <Card className="overflow-hidden border border-white/5 bg-white/[0.02] backdrop-blur-xl shadow-2xl rounded-[2.5rem] group hover:border-brand-gold/30 transition-all duration-500">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 px-8 pt-8">
+                <CardTitle className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">
                   {d.name}
                 </CardTitle>
-                <div className="p-2 rounded-xl bg-slate-50 group-hover:bg-orange-50 transition-colors">
-                  <d.icon className="h-4 w-4 text-slate-400 group-hover:text-orange-500" />
+                <div className="p-3 rounded-2xl bg-white/[0.03] border border-white/5 group-hover:bg-brand-gold/10 group-hover:border-brand-gold/20 transition-all">
+                   <TrendingUp className="h-4 w-4 text-brand-gold" />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-black italic tracking-tighter text-slate-900 group-hover:text-orange-600 transition-colors">
+              <CardContent className="px-8 pb-8">
+                <div className="text-5xl font-black italic tracking-tighter text-white group-hover:scale-110 origin-left transition-transform duration-500">
                   {d.value.toLocaleString()}
                 </div>
-                <div className="flex items-center gap-1 mt-2">
-                  <div className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                    <TrendingUp className="h-2 w-2" />
-                  </div>
-                  <span className="text-[10px] font-bold text-emerald-600 uppercase italic">Active Growth</span>
+                <div className="flex items-center gap-2 mt-4">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                  <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest italic">Live Delta</span>
                 </div>
               </CardContent>
             </Card>
@@ -183,35 +183,49 @@ const AnalyticsTab = () => {
       </div>
 
       {/* 3. Visual Bar Chart */}
-      <Card className="p-8 border-none shadow-2xl ring-1 ring-slate-100 rounded-[2.5rem]">
-        <div className="flex items-center justify-between mb-8">
+      <Card className="p-10 border border-white/10 bg-white/[0.01] backdrop-blur-md rounded-[3.5rem] shadow-2xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-4">
           <div>
-            <h3 className="text-xl font-black italic uppercase tracking-tighter text-slate-900">Activity <span className="text-orange-500">Distribution</span></h3>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Comparison of user interactions</p>
+            <h3 className="text-3xl font-black italic uppercase tracking-tighter text-white leading-none">Engagement <span className="text-brand-gold">Topology</span></h3>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mt-2">Interaction density per category</p>
+          </div>
+          <div className="flex gap-2">
+            {chartData.map((item) => (
+               <div key={item.name} className="flex items-center gap-2 bg-white/[0.03] px-3 py-1.5 rounded-full border border-white/5">
+                 <div className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
+                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">{item.name}</span>
+               </div>
+            ))}
           </div>
         </div>
-        <div className="h-[400px] w-full">
+        <div className="h-[450px] w-full pr-4">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="8 8" vertical={false} stroke="#f8fafc" />
+            <BarChart data={chartData} margin={{ top: 20, right: 0, left: -20, bottom: 20 }}>
+              <CartesianGrid strokeDasharray="12 12" vertical={false} stroke="rgba(255,255,255,0.03)" />
               <XAxis 
                 dataKey="name" 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 900, textTransform: 'uppercase' }}
+                tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em' }}
                 dy={20}
               />
               <YAxis 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
+                tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }}
               />
               <Tooltip 
-                cursor={{ fill: '#fff7ed', radius: 12 }}
-                contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', padding: '15px' }}
-                itemStyle={{ fontWeight: 900, fontSize: '12px', textTransform: 'uppercase' }}
+                cursor={{ fill: 'rgba(255,255,255,0.03)', radius: 24 }}
+                contentStyle={{ 
+                  backgroundColor: '#0a0a0a', 
+                  borderRadius: '24px', 
+                  border: '1px solid rgba(255,255,255,0.1)', 
+                  boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+                  padding: '20px'
+                }}
+                itemStyle={{ fontWeight: 900, fontSize: '12px', textTransform: 'uppercase', color: '#D4AF37' }}
               />
-              <Bar dataKey="value" radius={[12, 12, 12, 12]} barSize={60}>
+              <Bar dataKey="value" radius={[16, 16, 16, 16]} barSize={80}>
                 {chartData.map((entry, index) => (
                   <Cell 
                     key={`cell-${index}`} 

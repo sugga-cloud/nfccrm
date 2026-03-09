@@ -65,19 +65,19 @@ const ProfilesList = () => {
       {/* Header Area */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-black italic tracking-tighter uppercase text-slate-900">
-            Control <span className="text-orange-500">Center</span>
+          <h1 className="text-4xl font-black italic tracking-tighter uppercase text-white">
+            Control <span className="text-brand-gold">Center</span>
           </h1>
-          <p className="text-slate-500 font-medium text-sm mt-1">
+          <p className="text-slate-400 font-medium text-sm mt-1">
             Deep-dive into user tiers, billing cycles, and system access.
           </p>
         </div>
 
         <div className="relative w-full md:w-96 group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-brand-gold transition-colors" />
           <Input 
             placeholder="Search identity..." 
-            className="pl-11 h-12 rounded-2xl bg-white border-slate-200 shadow-sm focus-visible:ring-orange-500" 
+            className="pl-11 h-12 rounded-2xl bg-white/5 border-white/10 shadow-sm focus-visible:ring-brand-gold" 
             value={search} 
             onChange={(e) => setSearch(e.target.value)} 
           />
@@ -100,14 +100,14 @@ const ProfilesList = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className={cn(
-                "flex flex-col bg-white rounded-[2.5rem] border transition-all overflow-hidden",
-                expandedId === p.id ? "border-orange-200 shadow-xl" : "border-slate-100 shadow-sm"
+                "flex flex-col bg-white/5 rounded-[2.5rem] border transition-all overflow-hidden",
+                expandedId === p.id ? "border-brand-gold/30 shadow-xl" : "border-white/10 shadow-sm"
               )}
             >
               {/* Main Row */}
               <div className="grid grid-cols-1 md:grid-cols-12 items-center gap-4 p-4 md:p-6">
                 <div className="col-span-1 md:col-span-4 flex items-center gap-4">
-                  <div className="h-14 w-14 rounded-[1.2rem] bg-slate-900 flex items-center justify-center text-orange-500 shadow-lg">
+                  <div className="h-14 w-14 rounded-[1.2rem] bg-brand-gold flex items-center justify-center text-brand-dark shadow-lg">
                     <User className="h-7 w-7" />
                   </div>
                   <div className="overflow-hidden">
@@ -123,7 +123,7 @@ const ProfilesList = () => {
                 <div className="col-span-1 md:col-span-3">
                   <Badge className={cn(
                     "rounded-lg px-3 py-1 font-black uppercase tracking-widest text-[9px] border-none",
-                    p.plan_detail ? "bg-orange-500 text-white" : "bg-slate-100 text-slate-400"
+                    p.plan_detail ? "bg-brand-gold text-brand-dark" : "bg-white/10 text-slate-400"
                   )}>
                     {p.plan}
                   </Badge>
@@ -166,20 +166,20 @@ const ProfilesList = () => {
                     initial={{ height: 0 }}
                     animate={{ height: "auto" }}
                     exit={{ height: 0 }}
-                    className="bg-slate-50/50 border-t border-slate-100 overflow-hidden"
+                    className="bg-white/5 border-t border-white/10 overflow-hidden"
                   >
                     <div className="p-8 grid md:grid-cols-3 gap-8">
                       {/* Subscription Deep Dive */}
                       <div className="space-y-4">
                         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Financial Snapshot</p>
-                        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-3">
+                        <div className="bg-white/5 p-5 rounded-3xl border border-white/10 shadow-sm space-y-3">
                           <div className="flex justify-between items-center">
                             <span className="text-xs font-bold text-slate-400">Total Value</span>
                             <span className="text-sm font-black italic tracking-tight">₹{p.plan_detail?.price || '0.00'}</span>
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-xs font-bold text-slate-400">Method</span>
-                            <div className="flex items-center gap-1 text-[10px] font-black uppercase text-slate-900">
+                            <div className="flex items-center gap-1 text-[10px] font-black uppercase text-white">
                               <CreditCard className="h-3 w-3" /> Razorpay
                             </div>
                           </div>
@@ -189,17 +189,17 @@ const ProfilesList = () => {
                       {/* Expiry / Timeline */}
                       <div className="space-y-4">
                         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Lifecycle Timeline</p>
-                        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-3">
+                        <div className="bg-white/5 p-5 rounded-3xl border border-white/10 shadow-sm space-y-3">
                           <div className="flex justify-between items-center">
                             <span className="text-xs font-bold text-slate-400">Valid Until</span>
-                            <span className="text-xs font-bold text-slate-900">{p.plan_detail?.expiry || 'N/A'}</span>
+                            <span className="text-xs font-bold text-white">{p.plan_detail?.expiry || 'N/A'}</span>
                           </div>
                           {p.plan_detail && (
                             <div className="flex items-center gap-2">
-                              <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-orange-500 w-[60%]" />
+                              <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                <div className="h-full bg-brand-gold w-[60%]" />
                               </div>
-                              <span className="text-[10px] font-black text-orange-600 uppercase">
+                              <span className="text-[10px] font-black text-brand-gold uppercase">
                                 {getDaysLeft(p.plan_detail.expiry)} Days Left
                               </span>
                             </div>
@@ -227,7 +227,7 @@ const ProfilesList = () => {
   <Button 
     variant="ghost" 
     size="icon"
-    className="h-12 w-12 rounded-xl border border-slate-100 hover:bg-slate-100"
+    className="h-12 w-12 rounded-xl border border-white/10 hover:bg-white/5"
     onClick={() => {
       navigator.clipboard.writeText(p.email);
       toast.success("Email copied to clipboard!");
@@ -238,7 +238,7 @@ const ProfilesList = () => {
 </div>
                           <Button 
                             variant="outline" 
-                            className="rounded-xl h-12 text-[10px] font-black uppercase tracking-widest gap-2 text-orange-500 border-orange-100 hover:bg-orange-50"
+                            className="rounded-xl h-12 text-[10px] font-black uppercase tracking-widest gap-2 text-brand-gold border-brand-gold/30 hover:bg-brand-gold/10"
                             onClick={() => window.open(`/${p.username}`, '_blank')}
                           >
                             <ExternalLink className="h-3 w-3" /> Portal
@@ -246,10 +246,15 @@ const ProfilesList = () => {
                           <Button
                             variant="outline"
                             size="icon"
-                            className="h-12 w-12 rounded-xl text-blue-500"
+                            className="h-12 w-12 rounded-xl text-brand-gold"
                             onClick={() => {
                               // navigate to create tab with profile ID for editing
-                              window.location.href = `/admin?tab=create&profileId=${p.id}`;
+                              const currentPath = window.location.pathname;
+                              const basePath = currentPath.startsWith("/staff") ? "/staff" : "/admin";
+                              const params = new URLSearchParams(window.location.search);
+                              params.set("tab", "create");
+                              params.set("profileId", String(p.id));
+                              window.location.href = `${basePath}?${params.toString()}`;
                             }}
                           >
                             <Edit2 className="h-4 w-4" />

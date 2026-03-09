@@ -52,7 +52,7 @@ const QRTab = () => {
 
   if (isLoading) return (
     <div className="flex h-64 flex-col items-center justify-center">
-      <Loader2 className="h-10 w-10 animate-spin text-[#f97316]" />
+      <Loader2 className="h-10 w-10 animate-spin text-brand-gold" />
     </div>
   );
 
@@ -60,34 +60,34 @@ const QRTab = () => {
     <div className="max-w-4xl mx-auto space-y-8 p-4 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight italic">QUICK RESPONSE</h1>
-          <p className="text-slate-500 font-medium">Your digital storefront, one scan away.</p>
+          <h1 className="text-3xl font-black text-white tracking-tight italic">QUICK RESPONSE</h1>
+          <p className="text-slate-400 font-medium">Your digital storefront, one scan away.</p>
         </div>
         <Button 
           variant="outline" 
           size="sm"
-          className="rounded-xl border-slate-200 font-bold hover:bg-orange-50 text-slate-600"
+          className="rounded-xl border-white/10 font-bold hover:bg-brand-gold/20 text-slate-400"
           onClick={() => window.open(publicUrl, '_blank')}
         >
-          <ExternalLink className="mr-2 h-4 w-4 text-[#f97316]" /> 
+          <ExternalLink className="mr-2 h-4 w-4 text-brand-gold" /> 
           Live Preview
         </Button>
       </div>
 
       <div className="flex justify-center">
-        <Card className="w-full max-w-md border-none shadow-[0_32px_64px_-15px_rgba(0,0,0,0.1)] rounded-[3rem] overflow-hidden bg-white">
-          <div className="h-3 bg-[#f97316]" />
+        <Card className="w-full max-w-md border border-white/10 shadow-[0_32px_64px_-15px_rgba(0,0,0,0.2)] rounded-[3rem] overflow-hidden bg-white/5">
+          <div className="h-3 bg-brand-gold" />
           
           <CardContent className="flex flex-col items-center gap-8 p-10">
             <div className="text-center">
-              <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">
+              <h2 className="text-2xl font-black text-white uppercase tracking-tight">
                 {profile?.business_name || "Official Profile"}
               </h2>
-              <p className="text-[#f97316] text-[10px] font-black tracking-[0.4em] mt-1 uppercase">Scan to Connect</p>
+              <p className="text-brand-gold text-[10px] font-black tracking-[0.4em] mt-1 uppercase">Scan to Connect</p>
             </div>
 
             {/* Locally Generated QR Code */}
-            <div className="relative p-6 bg-white rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.05)] border border-slate-50">
+            <div className="relative p-6 bg-white/5 rounded-[2.5rem] border border-white/10">
               <QRCodeSVG
                 id="qr-code-svg"
                 value={publicUrl}
@@ -101,14 +101,14 @@ const QRTab = () => {
               {/* URL Display */}
               <div className="bg-slate-50 rounded-2xl p-4 flex items-center justify-between border border-slate-100">
                 <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="p-2 bg-white rounded-lg shadow-sm">
-                    <LinkIcon className="h-4 w-4 text-[#f97316]" />
+                  <div className="p-2 bg-white/5 rounded-lg border border-white/10">
+                    <LinkIcon className="h-4 w-4 text-brand-gold" />
                   </div>
                   <span className="text-xs font-bold text-slate-500 truncate">{publicUrl}</span>
                 </div>
                 <Button 
                   variant="ghost" 
-                  className="text-[10px] font-black text-[#f97316] hover:bg-orange-100 h-8 rounded-lg px-3"
+                  className="text-[10px] font-black text-brand-gold hover:bg-brand-gold/20 h-8 rounded-lg px-3"
                   onClick={() => {
                       navigator.clipboard.writeText(publicUrl);
                       toast.success("Link copied!");
@@ -122,7 +122,7 @@ const QRTab = () => {
               <div className="flex gap-3">
                 <Button 
                   onClick={downloadQRCode}
-                  className="flex-1 bg-[#f97316] hover:bg-black text-white rounded-2xl h-14 font-black uppercase tracking-widest transition-all active:scale-95"
+                  className="flex-1 bg-brand-gold hover:bg-brand-accent text-brand-dark rounded-2xl h-14 font-black uppercase tracking-widest transition-all active:scale-95"
                 >
                   <Download className="mr-2 h-5 w-5" /> Download
                 </Button>
@@ -135,7 +135,7 @@ const QRTab = () => {
                       toast.info("Share API not supported on this browser");
                     }
                   }}
-                  className="rounded-2xl h-14 w-14 border-slate-200 flex items-center justify-center p-0 hover:bg-slate-50"
+                  className="rounded-2xl h-14 w-14 border-white/10 flex items-center justify-center p-0 hover:bg-white/10"
                 >
                   <Share2 className="h-5 w-5 text-slate-600" />
                 </Button>

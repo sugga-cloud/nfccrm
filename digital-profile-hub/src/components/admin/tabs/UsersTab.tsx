@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { 
   UserCog, Search, Mail, Calendar, 
   ShieldCheck, Shield, MoreVertical, UserCircle,
-  Trash2, UserX, UserCheck, Loader2
+  Trash2, UserX, UserCheck, Loader2, BadgeAlert
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -70,7 +70,7 @@ const UsersTab = () => {
   };
 
   if (isLoading) return (
-    <div className="flex h-96 flex-col items-center justify-center text-orange-500 gap-4">
+    <div className="flex h-96 flex-col items-center justify-center text-brand-gold gap-4">
       <Loader2 className="h-10 w-10 animate-spin" />
       <p className="font-black italic uppercase tracking-widest text-xs">Accessing User Records...</p>
     </div>
@@ -82,11 +82,11 @@ const UsersTab = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <UserCircle className="h-4 w-4 text-orange-500" />
+            <UserCircle className="h-4 w-4 text-brand-gold" />
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">User Directory</span>
           </div>
-          <h1 className="text-4xl font-black italic tracking-tighter uppercase text-slate-900">
-            Account <span className="text-orange-500">Database</span>
+          <h1 className="text-4xl font-black italic tracking-tighter uppercase text-white">
+            Account <span className="text-brand-gold">Database</span>
           </h1>
         </div>
 
@@ -94,7 +94,7 @@ const UsersTab = () => {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input 
             placeholder="Search by name or email..." 
-            className="pl-11 h-12 rounded-2xl bg-white border-slate-100 shadow-sm focus-visible:ring-orange-500"
+            className="pl-11 h-12 rounded-2xl bg-white/5 border-white/10 shadow-sm focus-visible:ring-brand-gold"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -121,20 +121,20 @@ const UsersTab = () => {
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ delay: idx * 0.02 }}
               className={cn(
-                "grid grid-cols-1 md:grid-cols-12 items-center gap-4 p-5 md:p-6 bg-white rounded-[2rem] border border-slate-50 shadow-sm hover:shadow-xl transition-all group",
-                !u.is_active && "opacity-60 bg-slate-50/50"
+                "grid grid-cols-1 md:grid-cols-12 items-center gap-4 p-5 md:p-6 bg-white/5 rounded-[2rem] border border-white/10 shadow-sm hover:border-brand-gold/20 transition-all group",
+                !u.is_active && "opacity-60"
               )}
             >
               {/* Identity */}
               <div className="col-span-1 md:col-span-4 flex items-center gap-4">
                 <div className={cn(
                   "h-12 w-12 rounded-2xl text-white flex items-center justify-center font-black italic text-sm shadow-lg transition-colors",
-                  u.is_active ? "bg-slate-900 group-hover:bg-orange-500" : "bg-slate-400"
+                  u.is_active ? "bg-brand-gold text-brand-dark group-hover:opacity-90" : "bg-slate-600"
                 )}>
                   {getInitials(u.full_name)}
                 </div>
                 <div className="overflow-hidden">
-                  <p className="text-sm font-black italic uppercase tracking-tighter text-slate-900 truncate">
+                  <p className="text-sm font-black italic uppercase tracking-tighter text-white truncate">
                     {u.full_name}
                   </p>
                   <div className="flex items-center gap-1.5 text-xs text-slate-400 font-bold">
@@ -155,12 +155,24 @@ const UsersTab = () => {
 
               {/* Role */}
               <div className="col-span-1 md:col-span-2 flex justify-start md:justify-center">
-                <Badge className={cn(
-                  "rounded-lg px-3 py-1 font-black uppercase tracking-widest text-[9px] border-none",
-                  u.role_id === 1 ? "bg-orange-100 text-orange-600" : "bg-slate-100 text-slate-500"
-                )}>
-                  {u.role_id === 1 ? <ShieldCheck className="h-3 w-3 mr-1 inline" /> : <Shield className="h-3 w-3 mr-1 inline" />}
-                  {u.role_id === 1 ? 'Admin' : 'Customer'}
+                <Badge
+                  className={cn(
+                    "rounded-lg px-3 py-1 font-black uppercase tracking-widest text-[9px] border-none",
+                    u.role_id === 1
+                      ? "bg-brand-gold/20 text-brand-gold"
+                      : u.role_id === 3
+                      ? "bg-blue-500/20 text-blue-400"
+                      : "bg-white/10 text-slate-400"
+                  )}
+                >
+                  {u.role_id === 1 ? (
+                    <ShieldCheck className="h-3 w-3 mr-1 inline" />
+                  ) : u.role_id === 3 ? (
+                    <UserCog className="h-3 w-3 mr-1 inline" />
+                  ) : (
+                    <Shield className="h-3 w-3 mr-1 inline" />
+                  )}
+                  {u.role_id === 1 ? "Admin" : u.role_id === 3 ? "Staff" : "Customer"}
                 </Badge>
               </div>
 
@@ -176,11 +188,11 @@ const UsersTab = () => {
               <div className="col-span-1 md:col-span-2 flex items-center justify-end gap-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="rounded-xl text-slate-300 hover:text-slate-900">
+                    <Button variant="ghost" size="icon" className="rounded-xl text-slate-400 hover:text-white">
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 rounded-2xl p-2 shadow-xl border-slate-100">
+                  <DropdownMenuContent align="end" className="w-48 rounded-2xl p-2 shadow-xl border-white/10 bg-[#0A1225]">
                     <DropdownMenuItem 
                       disabled={statusMutation.isPending}
                       onClick={() => statusMutation.mutate({ id: u.id, is_active: !u.is_active })}
@@ -195,7 +207,7 @@ const UsersTab = () => {
                     <DropdownMenuItem 
                       disabled={deleteMutation.isPending}
                       onClick={() => handleDelete(u.id)}
-                      className="rounded-xl font-bold text-xs py-3 text-red-600 cursor-pointer hover:bg-red-50"
+                      className="rounded-xl font-bold text-xs py-3 text-red-400 cursor-pointer hover:bg-red-500/10"
                     >
                       <Trash2 className="h-4 w-4 mr-2" /> Permanent Delete
                     </DropdownMenuItem>

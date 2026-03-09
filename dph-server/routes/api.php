@@ -58,9 +58,11 @@ Route::middleware('auth:sanctum','is_active')->group(function () {
     // can show the "Renew Now" card.
     Route::get('/user/current-subscription', [PaymentController::class, 'getCurrentSubscription']);
 
-    // Profile (Usually allowed so users can fix their email/billing info)
-    Route::get('/my-profile', [ProfileController::class, 'myProfile']);
-    Route::put('/my-profile', [ProfileController::class, 'update']);
+    // Profile (Customer-only self profile management)
+    Route::middleware('role:customer')->group(function () {
+        Route::get('/my-profile', [ProfileController::class, 'myProfile']);
+        Route::put('/my-profile', [ProfileController::class, 'update']);
+    });
 
 
     /*
@@ -69,7 +71,7 @@ Route::middleware('auth:sanctum','is_active')->group(function () {
     |--------------------------------------------------------------------------
     | No data from these resources will be transferred if 'subscribed' fails.
     */
-    Route::middleware('subscribed')->group(function () {
+    Route::middleware(['subscribed','role:customer'])->group(function () {
         
         // Content Management
         Route::apiResource('services', ServiceController::class);
@@ -86,7 +88,7 @@ Route::middleware('auth:sanctum','is_active')->group(function () {
         Route::apiResource('appointments', AppointmentController::class);
         Route::apiResource('enquiries', EnquiryController::class);
 
-        // Business Settings
+        // Business Settings (customer-only for their own profile)
         Route::get('/profile/hours', [ProfileController::class, 'getHours']);
         Route::post('/profile/hours', [ProfileController::class, 'updateHours']);
         Route::get('/profile/social-links', [ProfileController::class, 'getSocialLinks']);
@@ -108,7 +110,7 @@ Route::middleware('auth:sanctum','is_active')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth:sanctum', 'role:admin,staff'])->prefix('admin')->group(function () {
     Route::get('/analytics', [AdminController::class, 'analytics']); // For AdminAnalytics tab
     Route::get('/profiles', [AdminController::class, 'profiles']);   // For ProfilesList tab
     // Admin profile management
@@ -122,6 +124,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::get('/plans', [AdminController::class, 'plans']);
     Route::delete('/users/{user}', [AdminController::class, 'destroy']);
     Route::patch('/users/{user}/status', [AdminController::class, 'toggleStatus']);
+    Route::post('/staff', [AdminController::class, 'createStaff']);
     // POST create plan -> Used for new plans
     Route::post('/plans', [AdminController::class, 'storePlan']);
     

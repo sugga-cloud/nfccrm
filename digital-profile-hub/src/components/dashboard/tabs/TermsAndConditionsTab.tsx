@@ -37,7 +37,7 @@ const TermsAndConditionsTab = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["termsData"] });
       toast.success("Legal documents updated!", {
-        className: "bg-slate-900 text-white border-none",
+        className: "bg-brand-gold text-brand-dark border-none",
       });
     },
     onError: () => toast.error("Failed to save terms."),
@@ -51,7 +51,7 @@ const TermsAndConditionsTab = () => {
 
   if (isLoading) return (
     <div className="flex h-64 items-center justify-center">
-      <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
+      <Loader2 className="h-8 w-8 animate-spin text-brand-gold" />
     </div>
   );
 
@@ -70,14 +70,14 @@ const TermsAndConditionsTab = () => {
           <Button 
             variant="outline" 
             onClick={handleAutoGenerate}
-            className="rounded-xl border-slate-200 hover:bg-orange-50 hover:text-orange-600 transition-all"
+            className="rounded-xl border-white/10 hover:bg-brand-gold/20 hover:text-brand-gold transition-all"
           >
             <Wand2 className="h-4 w-4 mr-2" /> Magic Template
           </Button>
           <Button 
             onClick={() => saveMutation.mutate({ title, content })}
             disabled={saveMutation.isPending}
-            className="bg-slate-900 hover:bg-black text-white rounded-xl px-8 shadow-lg"
+            className="bg-brand-gold hover:bg-brand-accent text-brand-dark rounded-xl px-8 shadow-lg"
           >
             {saveMutation.isPending ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <Save className="h-4 w-4 mr-2" />}
             Save Terms
@@ -88,8 +88,8 @@ const TermsAndConditionsTab = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Main Editor Card */}
-        <Card className="lg:col-span-2 border-slate-200 shadow-sm rounded-2xl">
-          <CardHeader className="border-b border-slate-100 bg-slate-50/30">
+        <Card className="lg:col-span-2 border-white/10 bg-white/5 rounded-2xl">
+          <CardHeader className="border-b border-white/10 bg-white/5">
             <div className="space-y-2">
                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Document Title</label>
                <Input 
@@ -105,20 +105,20 @@ const TermsAndConditionsTab = () => {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Start typing your terms and conditions here..."
-              className="min-h-[500px] border-none rounded-none p-8 focus-visible:ring-0 resize-none text-slate-700 leading-relaxed font-medium"
+              className="min-h-[500px] border-none rounded-none p-8 focus-visible:ring-0 resize-none text-slate-300 leading-relaxed font-medium bg-transparent"
             />
           </CardContent>
         </Card>
 
         {/* Sidebar Info */}
         <div className="space-y-6">
-          <Card className="border-orange-100 bg-orange-50/50 rounded-2xl">
+          <Card className="border-brand-gold/30 bg-brand-gold/10 rounded-2xl">
             <CardContent className="p-6 space-y-4">
               <div className="h-10 w-10 bg-orange-100 rounded-full flex items-center justify-center">
                 <ShieldCheck className="text-orange-600 h-6 w-6" />
               </div>
-              <h3 className="font-bold text-slate-900">Why add terms?</h3>
-              <p className="text-sm text-slate-600 leading-snug">
+              <h3 className="font-bold text-white">Why add terms?</h3>
+              <p className="text-sm text-slate-400 leading-snug">
                 Clear terms protect your business from misunderstandings regarding payments, delivery times, and scope of work.
               </p>
               <ul className="text-xs space-y-2 text-slate-500 font-medium italic">
@@ -129,7 +129,7 @@ const TermsAndConditionsTab = () => {
             </CardContent>
           </Card>
 
-          <div className="p-6 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center text-center space-y-2">
+          <div className="p-6 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center text-center space-y-2">
             <FileText className="h-8 w-8 text-slate-300" />
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Preview Mode</p>
             <p className="text-[11px] text-slate-500 italic">

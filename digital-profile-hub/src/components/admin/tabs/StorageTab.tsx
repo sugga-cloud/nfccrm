@@ -35,7 +35,7 @@ const StorageTab = () => {
   );
 
   if (isLoading) return (
-    <div className="flex h-96 flex-col items-center justify-center text-orange-500 gap-4">
+    <div className="flex h-96 flex-col items-center justify-center text-brand-gold gap-4">
       <Loader2 className="h-10 w-10 animate-spin" />
       <p className="font-black italic uppercase tracking-widest text-xs">Scanning Node Storage...</p>
     </div>
@@ -47,7 +47,7 @@ const StorageTab = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Database className={cn("h-4 w-4 text-orange-500", isFetching && "animate-pulse")} />
+            <Database className={cn("h-4 w-4 text-brand-gold", isFetching && "animate-pulse")} />
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
               {isFetching ? "Syncing Live Data..." : "Resource Infrastructure"}
             </span>
@@ -58,10 +58,10 @@ const StorageTab = () => {
         </div>
 
         <div className="relative w-full md:w-96 group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-brand-gold transition-colors" />
           <Input 
             placeholder="Search users..." 
-            className="pl-11 h-12 rounded-2xl bg-white border-slate-100 shadow-sm focus-visible:ring-orange-500"
+            className="pl-11 h-12 rounded-2xl bg-white/5 border border-white/10 focus-visible:ring-brand-gold"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -93,13 +93,13 @@ const StorageTab = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ delay: idx * 0.02 }}
-                className="grid grid-cols-1 md:grid-cols-12 items-center gap-6 p-6 bg-white rounded-[2rem] border border-slate-50 shadow-sm hover:shadow-xl hover:border-orange-100 transition-all group"
+                className="grid grid-cols-1 md:grid-cols-12 items-center gap-6 p-6 bg-white/5 rounded-[2rem] border border-white/10 hover:border-brand-gold/40 transition-all group"
               >
                 {/* User Identity */}
                 <div className="col-span-1 md:col-span-4 flex items-center gap-4">
                   <div className={cn(
                     "h-12 w-12 rounded-2xl flex items-center justify-center transition-colors shadow-lg",
-                    isCritical ? "bg-rose-500 text-white" : "bg-slate-900 text-white"
+                    isCritical ? "bg-rose-500 text-white" : "bg-brand-gold/20 text-brand-gold"
                   )}>
                     <HardDrive className="h-5 w-5" />
                   </div>
@@ -107,7 +107,7 @@ const StorageTab = () => {
                     <p className="text-sm font-black italic uppercase tracking-tighter text-slate-900 group-hover:text-orange-500 transition-colors">
                       {user.username}
                     </p>
-                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-700 uppercase tracking-widest mt-0.5">
+                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
                       <br/>Plan: {user.plan}
                     </div>
                   </div>
@@ -117,7 +117,7 @@ const StorageTab = () => {
                 <div className="col-span-1 md:col-span-6 space-y-3">
                   <div className="flex justify-between items-end mb-1 px-1">
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                      <span className="text-slate-900">{usedMb.toFixed(1)}MB</span> / {user.limit_mb}MB
+                      <span className="text-white">{usedMb.toFixed(1)}MB</span> / {user.limit_mb}MB
                     </p>
                     <div className="flex items-center gap-1">
                       {isCritical && <AlertTriangle className="h-3 w-3 text-rose-500 animate-pulse" />}
@@ -129,7 +129,7 @@ const StorageTab = () => {
                       </span>
                     </div>
                   </div>
-                  <div className="relative h-3 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-50">
+                  <div className="relative h-3 w-full bg-white/10 rounded-full overflow-hidden border border-white/5">
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: `${percentage}%` }}
@@ -150,7 +150,7 @@ const StorageTab = () => {
                       {Math.max(0, user.limit_mb - usedMb).toFixed(1)} MB
                     </p>
                   </div>
-                  <button className="md:hidden w-full flex items-center justify-center gap-2 p-3 bg-slate-50 rounded-xl text-[10px] font-black uppercase tracking-widest">
+                  <button className="md:hidden w-full flex items-center justify-center gap-2 p-3 bg-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-white">
                     View Details <ArrowUpRight className="h-3 w-3" />
                   </button>
                 </div>

@@ -11,7 +11,6 @@ const Navbar = () => {
   const { role, logout } = useRole();
   const navigate = useNavigate();
 
-  // Handle scroll effect for glassmorphism
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
@@ -23,55 +22,65 @@ const Navbar = () => {
     setMobileOpen(false);
     navigate("/login");
   };
-  const isLoggedIn = role === "customer" || role === "admin";
+  const isLoggedIn = role === "customer" || role === "admin" || role === "staff";
 
   return (
-  <header 
-  className={cn(
-    "sticky top-0 z-[50] w-full transition-all duration-300 ease-in-out",
-    // Keep height consistent to prevent layout shift
-    "h-16 md:h-20 flex items-center", 
-    scrolled 
-      ? "bg-white/80 backdrop-blur-lg border-b border-slate-100 shadow-sm py-2" 
-      : "bg-transparent py-4"
-  )}
->
+    <header 
+      className={cn(
+        "sticky top-0 z-[50] w-full transition-all duration-500 ease-in-out",
+        "h-16 md:h-20 flex items-center", 
+        scrolled 
+          ? "bg-brand-dark/90 backdrop-blur-xl border-b border-white/10 shadow-2xl py-2" 
+          : "bg-transparent py-4"
+      )}
+    >
       <div className="container mx-auto px-4 flex h-14 items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <div className="bg-[#f97316] p-1.5 rounded-xl transition-transform group-hover:rotate-12">
-            <div className="h-5 w-5 bg-white rounded-md" />
-          </div>
-          <span className="text-xl font-black italic tracking-tighter text-slate-900 uppercase">
-            NFC<span className="text-[#f97316]">PROFILE</span>
-          </span>
+          <img
+            src="/logo.PNG"
+            alt="MyWebLink logo"
+            className="h-18 md:h-12 w-auto object-contain"
+          />
         </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-8 md:flex">
-          <Link to="/pricing" className="group flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-[#f97316] transition-colors">
-            <CreditCard className="h-3.5 w-3.5" /> Pricing
-          </Link>
-          
-          {role === "customer" && (
-            <Link to="/dashboard" className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-[#f97316] transition-colors">
-              <LayoutDashboard className="h-3.5 w-3.5" /> Dashboard
+          {[
+            { to: "/pricing", label: "Pricing", icon: CreditCard, show: true },
+            { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, show: role === "customer" },
+            { to: "/admin", label: "Admin", icon: ShieldCheck, show: role === "admin" },
+            { to: "/staff", label: "Staff Panel", icon: LayoutDashboard, show: role === "staff" },
+          ].map((item) => item.show && (
+            <Link 
+              key={item.to}
+              to={item.to} 
+              className={cn(
+                "group flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.2em] transition-colors",
+                scrolled ? "text-slate-300 hover:text-brand-gold" : "text-slate-500 hover:text-brand-gold"
+              )}
+            >
+              <item.icon className="h-3.5 w-3.5" /> {item.label}
             </Link>
-          )}
+          ))}
           
-          {role === "admin" && (
-            <Link to="/admin" className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-[#f97316] transition-colors">
-              <ShieldCheck className="h-3.5 w-3.5" /> Admin
-            </Link>
-          )}
-
-          <div className="flex items-center gap-3 ml-4 pl-6 border-l border-slate-200">
+          <div className={cn(
+            "flex items-center gap-3 ml-4 pl-6 border-l",
+            scrolled ? "border-white/10" : "border-slate-200"
+          )}>
             {!isLoggedIn ? (
               <>
-                <Button variant="ghost" className="text-xs font-black uppercase tracking-widest text-slate-600 hover:text-[#f97316] hover:bg-orange-50 rounded-xl" asChild>
+                <Button 
+                  variant="ghost" 
+                  className={cn(
+                    "text-[11px] font-black uppercase tracking-[0.2em] rounded-xl transition-all",
+                    scrolled ? "text-white hover:bg-white/5" : "text-slate-600 hover:bg-slate-100"
+                  )} 
+                  asChild
+                >
                   <Link to="/login">Login</Link>
                 </Button>
-                <Button className="bg-[#f97316] hover:bg-black text-white text-xs font-black uppercase tracking-widest rounded-xl px-6 shadow-lg shadow-orange-100" asChild>
+                <Button className="btn-gold h-10 px-6 rounded-xl text-[11px]" asChild>
                   <Link to="/register">Join Now</Link>
                 </Button>
               </>
@@ -79,7 +88,12 @@ const Navbar = () => {
               <Button 
                 onClick={handleLogout}
                 variant="outline" 
-                className="border-slate-200 text-slate-600 hover:text-red-600 hover:bg-red-50 hover:border-red-100 rounded-xl text-xs font-black uppercase tracking-widest gap-2"
+                className={cn(
+                  "rounded-xl text-[11px] font-black uppercase tracking-[0.2em] gap-2 transition-all",
+                  scrolled 
+                    ? "border-white/10 text-slate-300 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20" 
+                    : "border-slate-200 text-slate-600 hover:bg-red-50 hover:text-red-600"
+                )}
               >
                 <LogOut className="h-3.5 w-3.5" /> Logout
               </Button>
@@ -89,7 +103,10 @@ const Navbar = () => {
 
         {/* Mobile Toggle */}
         <button 
-          className="md:hidden p-2 rounded-xl bg-slate-50 text-slate-600 active:scale-90 transition-transform" 
+          className={cn(
+            "md:hidden p-2 rounded-xl transition-all active:scale-90",
+            scrolled ? "bg-white/5 text-brand-gold" : "bg-slate-100 text-slate-600"
+          )} 
           onClick={() => setMobileOpen(!mobileOpen)}
         >
           {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -98,25 +115,34 @@ const Navbar = () => {
 
       {/* Mobile Navigation Menu */}
       {mobileOpen && (
-        <nav className="absolute top-full left-0 w-full bg-white border-b border-slate-100 p-6 flex flex-col gap-4 md:hidden animate-in slide-in-from-top-4 duration-300">
-          <Link to="/pricing" className="text-sm font-bold text-slate-600 flex items-center gap-3 p-2" onClick={() => setMobileOpen(false)}>
-            <CreditCard className="h-4 w-4 text-[#f97316]" /> Pricing
-          </Link>
-          
-          {isLoggedIn && (
-            <Link to={role === "admin" ? "/admin" : "/dashboard"} className="text-sm font-bold text-slate-600 flex items-center gap-3 p-2" onClick={() => setMobileOpen(false)}>
-              <LayoutDashboard className="h-4 w-4 text-[#f97316]" /> {role === "admin" ? "Admin Panel" : "Dashboard"}
+        <nav className="absolute top-full left-0 w-full bg-brand-dark border-b border-white/5 p-8 flex flex-col gap-6 md:hidden animate-in fade-in slide-in-from-top-4 duration-300 shadow-2xl">
+          {[
+            { to: "/pricing", label: "Pricing", icon: CreditCard, show: true },
+            { 
+              to: role === "admin" ? "/admin" : role === "staff" ? "/staff" : "/dashboard", 
+              label: role === "admin" ? "Admin Panel" : role === "staff" ? "Staff Panel" : "Dashboard", 
+              icon: LayoutDashboard, 
+              show: isLoggedIn 
+            },
+          ].map((item) => item.show && (
+            <Link 
+              key={item.to}
+              to={item.to} 
+              className="text-xs font-black uppercase tracking-[0.2em] text-slate-300 flex items-center gap-4 p-3 rounded-2xl hover:bg-white/5 transition-colors"
+              onClick={() => setMobileOpen(false)}
+            >
+              <item.icon className="h-5 w-5 text-brand-gold" /> {item.label}
             </Link>
-          )}
+          ))}
 
-          <hr className="border-slate-50" />
+          <hr className="border-white/5" />
 
           {!isLoggedIn ? (
-            <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" className="rounded-xl font-bold" asChild>
+            <div className="grid grid-cols-2 gap-4">
+              <Button variant="outline" className="rounded-2xl font-black uppercase tracking-widest border-white/10 text-white" asChild>
                 <Link to="/login" onClick={() => setMobileOpen(false)}>Login</Link>
               </Button>
-              <Button className="bg-[#f97316] hover:bg-black text-white rounded-xl font-bold" asChild>
+              <Button className="btn-gold rounded-2xl" asChild>
                 <Link to="/register" onClick={() => setMobileOpen(false)}>Register</Link>
               </Button>
             </div>
@@ -124,7 +150,7 @@ const Navbar = () => {
             <Button 
               onClick={handleLogout}
               variant="destructive" 
-              className="w-full rounded-xl font-bold gap-2"
+              className="w-full rounded-2xl font-black uppercase tracking-widest gap-2 bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white"
             >
               <LogOut className="h-4 w-4" /> Logout
             </Button>

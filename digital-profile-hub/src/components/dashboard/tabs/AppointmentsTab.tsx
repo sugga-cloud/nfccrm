@@ -54,7 +54,7 @@ const AppointmentsTab = () => {
 
   if (isLoading) return (
     <div className="flex h-64 flex-col items-center justify-center gap-4">
-      <Loader2 className="h-10 w-10 animate-spin text-[#f97316]" />
+      <Loader2 className="h-10 w-10 animate-spin text-brand-gold" />
       <p className="text-slate-400 font-medium">Loading your schedule...</p>
     </div>
   );
@@ -63,28 +63,28 @@ const AppointmentsTab = () => {
     <div className="max-w-6xl mx-auto space-y-6 p-4">
       
       {/* Header with forced orange theme */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Appointments</h1>
-          <p className="text-slate-500 font-medium mt-1">Manage your bookings and client meetings.</p>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">Appointments</h1>
+          <p className="text-slate-400 font-medium mt-1">Manage your bookings and client meetings.</p>
         </div>
         <div className="flex items-center gap-3">
-            <div className="bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm font-bold text-slate-600 flex items-center gap-2 shadow-sm">
-                <CalendarCheck className="h-4 w-4 text-[#f97316]" />
-                <span className="text-[#f97316]">{appointments.filter((a: any) => a.status === 'pending').length}</span> Pending
+            <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-sm font-bold text-slate-400 flex items-center gap-2">
+                <CalendarCheck className="h-4 w-4 text-brand-gold" />
+                <span className="text-brand-gold">{appointments.filter((a: any) => a.status === 'pending').length}</span> Pending
             </div>
         </div>
       </div>
 
       {/* Main Table Container */}
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-md overflow-hidden">
+      <div className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
         <Table>
-          <TableHeader className="bg-slate-50/80">
-            <TableRow className="border-b border-slate-200">
-              <TableHead className="font-bold text-slate-700 py-4 px-6">Customer</TableHead>
-              <TableHead className="font-bold text-slate-700">Schedule</TableHead>
-              <TableHead className="font-bold text-slate-700">Status</TableHead>
-              <TableHead className="text-right font-bold text-slate-700 px-6">Manage</TableHead>
+          <TableHeader className="bg-white/5">
+            <TableRow className="border-b border-white/10">
+              <TableHead className="font-bold text-white py-4 px-6">Customer</TableHead>
+              <TableHead className="font-bold text-white">Schedule</TableHead>
+              <TableHead className="font-bold text-white">Status</TableHead>
+              <TableHead className="text-right font-bold text-white px-6">Manage</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -99,14 +99,14 @@ const AppointmentsTab = () => {
               </TableRow>
             ) : (
               appointments.map((a: any) => (
-                <TableRow key={a.id} className="hover:bg-orange-50/30 transition-all border-b border-slate-100 last:border-0">
+                <TableRow key={a.id} className="hover:bg-brand-gold/10 transition-all border-b border-white/10 last:border-0">
                   <TableCell className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-[#f97316] font-bold border border-orange-200">
+                      <div className="h-10 w-10 rounded-full bg-brand-gold/20 flex items-center justify-center text-brand-gold font-bold border border-brand-gold/30">
                         <User className="h-5 w-5" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-bold text-slate-800 leading-none mb-1">{a.customer_name}</span>
+                        <span className="font-bold text-white leading-none mb-1">{a.customer_name}</span>
                         <span className="text-xs text-slate-400 font-medium">{a.customer_email || 'No email'}</span>
                       </div>
                     </div>
@@ -114,8 +114,8 @@ const AppointmentsTab = () => {
                   
                   <TableCell>
                     <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
-                        <Calendar className="h-3.5 w-3.5 text-[#f97316]" />
+                      <div className="flex items-center gap-2 text-sm font-bold text-white">
+                        <Calendar className="h-3.5 w-3.5 text-brand-gold" />
                         {format(parseISO(a.appointment_date), "MMM dd, yyyy")}
                       </div>
                       <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
@@ -129,7 +129,7 @@ const AppointmentsTab = () => {
                     <div className={cn(
                         "inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border",
                         a.status === 'confirmed' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : 
-                        a.status === 'pending' ? "bg-orange-50 text-orange-600 border-orange-100" :
+                        a.status === 'pending' ? "bg-brand-gold/20 text-brand-gold border-brand-gold/30" :
                         "bg-rose-50 text-rose-600 border-rose-100"
                     )}>
                       {a.status}
@@ -139,11 +139,11 @@ const AppointmentsTab = () => {
                   <TableCell className="text-right px-6">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-9 w-9 p-0 hover:bg-orange-100 rounded-full">
+                        <Button variant="ghost" className="h-9 w-9 p-0 hover:bg-brand-gold/20 rounded-full">
                           <MoreHorizontal className="h-5 w-5 text-slate-400" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-44 rounded-xl shadow-2xl border-slate-100 p-1">
+                      <DropdownMenuContent align="end" className="w-44 rounded-xl shadow-2xl border-white/10 bg-brand-dark p-1">
                         <DropdownMenuItem 
                           onClick={() => statusMutation.mutate({ id: a.id, status: 'confirmed' })}
                           className="flex items-center px-3 py-2 text-sm font-bold text-emerald-600 hover:bg-emerald-50 rounded-lg cursor-pointer"

@@ -90,7 +90,7 @@ const ReviewQRTab = () => {
           <div className="flex flex-col items-center justify-center h-64 text-center space-y-4">
               <MapPin className="h-12 w-12 text-slate-300" />
               <p className="text-slate-500 font-medium">Map Link not configured.</p>
-              <Button variant="link" className="text-orange-600 font-bold uppercase tracking-tighter">Go to Profile Settings</Button>
+              <Button variant="link" className="text-brand-gold font-bold uppercase tracking-tighter">Go to Profile Settings</Button>
           </div>
       )
   }
@@ -99,23 +99,23 @@ const ReviewQRTab = () => {
     <div className="max-w-4xl mx-auto space-y-8 p-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight italic uppercase">Review Booster</h1>
-          <p className="text-slate-500 font-medium">Get 5-star reviews directly on Google Maps.</p>
+          <h1 className="text-3xl font-black text-white tracking-tight italic uppercase">Review Booster</h1>
+          <p className="text-slate-400 font-medium">Get 5-star reviews directly on Google Maps.</p>
         </div>
         <Button 
           variant="outline" 
           size="sm"
-          className="rounded-xl border-slate-200 font-bold hover:bg-yellow-50 text-slate-600"
+          className="rounded-xl border-white/10 font-bold hover:bg-brand-gold/20 text-slate-400"
           onClick={() => window.open(reviewUrl, '_blank')}
         >
-          <ExternalLink className="mr-2 h-4 w-4 text-yellow-500" /> 
+          <ExternalLink className="mr-2 h-4 w-4 text-brand-gold" /> 
           Test Review Link
         </Button>
       </div>
 
       <div className="flex justify-center">
-        <Card className="w-full max-w-md border-none shadow-[0_40px_80px_-15px_rgba(0,0,0,0.12)] rounded-[3rem] overflow-hidden bg-white">
-          <div className="h-3 bg-yellow-400" />
+        <Card className="w-full max-w-md border border-white/10 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.2)] rounded-[3rem] overflow-hidden bg-white/5">
+          <div className="h-3 bg-brand-gold" />
           
           <CardContent className="flex flex-col items-center gap-8 p-10">
             <div className="text-center">
@@ -124,13 +124,13 @@ const ReviewQRTab = () => {
                       <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   ))}
               </div>
-              <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">
+              <h2 className="text-2xl font-black text-white uppercase tracking-tight">
                 {profile?.business_name || "Leave a Review"}
               </h2>
-              <p className="text-yellow-600 text-[10px] font-black tracking-[0.4em] mt-1 uppercase italic">Your feedback matters</p>
+              <p className="text-brand-gold text-[10px] font-black tracking-[0.4em] mt-1 uppercase italic">Your feedback matters</p>
             </div>
 
-            <div className="relative p-6 bg-white rounded-[2.5rem] shadow-[0_0_60px_rgba(0,0,0,0.08)] border border-slate-50">
+            <div className="relative p-6 bg-white/5 rounded-[2.5rem] border border-white/10">
               <QRCodeSVG
                 id="review-qr-svg"
                 value={reviewUrl}
@@ -139,7 +139,7 @@ const ReviewQRTab = () => {
                 includeMargin={false}
               />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="bg-white p-2 rounded-full shadow-md border border-slate-100">
+                  <div className="bg-white/5 p-2 rounded-full border border-white/10">
                     <Star className="h-6 w-6 fill-yellow-400 text-yellow-400" />
                   </div>
               </div>
@@ -149,7 +149,7 @@ const ReviewQRTab = () => {
               <div className="flex gap-3">
                 <Button 
                   onClick={downloadQRCode}
-                  className="flex-1 bg-yellow-400 hover:bg-black text-black hover:text-white rounded-2xl h-14 font-black uppercase tracking-widest transition-all active:scale-95"
+                  className="flex-1 bg-brand-gold hover:bg-brand-accent text-brand-dark rounded-2xl h-14 font-black uppercase tracking-widest transition-all active:scale-95"
                 >
                   <Download className="mr-2 h-5 w-5" /> Save PNG
                 </Button>
@@ -163,7 +163,7 @@ const ReviewQRTab = () => {
                       toast.success("Link copied to clipboard!");
                     }
                   }}
-                  className="rounded-2xl h-14 w-14 border-slate-200 flex items-center justify-center p-0 hover:bg-slate-50"
+                  className="rounded-2xl h-14 w-14 border-white/10 flex items-center justify-center p-0 hover:bg-white/10"
                 >
                   <Share2 className="h-5 w-5 text-slate-600" />
                 </Button>

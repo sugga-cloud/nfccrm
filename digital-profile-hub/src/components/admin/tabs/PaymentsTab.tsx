@@ -46,7 +46,7 @@ const PaymentsTab = () => {
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-      <div className="h-12 w-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin" />
+      <div className="h-12 w-12 border-4 border-brand-gold/20 border-t-brand-gold rounded-full animate-spin" />
       <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Syncing Ledger...</p>
     </div>
   );
@@ -56,28 +56,28 @@ const PaymentsTab = () => {
       
       {/* 1. Statistics Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-slate-900 p-6 rounded-[2.5rem] text-white">
-          <div className="flex items-center gap-3 mb-4 text-orange-500">
+        <div className="bg-white/5 border border-white/10 p-6 rounded-[2.5rem] text-white">
+          <div className="flex items-center gap-3 mb-4 text-brand-gold">
             <TrendingUp className="h-5 w-5" />
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Collection</span>
           </div>
           <h2 className="text-4xl font-black italic tracking-tighter italic">₹{totalRevenue.toLocaleString('en-IN')}</h2>
         </div>
 
-        <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm">
-          <div className="flex items-center gap-3 mb-4 text-emerald-500">
+        <div className="bg-white/5 p-6 rounded-[2.5rem] border border-white/10">
+          <div className="flex items-center gap-3 mb-4 text-emerald-400">
             <CheckCircle2 className="h-5 w-5" />
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Successful TXNs</span>
           </div>
-          <h2 className="text-4xl font-black italic tracking-tighter italic text-slate-900">{successfulTxns}</h2>
+          <h2 className="text-4xl font-black italic tracking-tighter italic text-white">{successfulTxns}</h2>
         </div>
 
-        <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm">
-          <div className="flex items-center gap-3 mb-4 text-orange-500">
+        <div className="bg-white/5 p-6 rounded-[2.5rem] border border-white/10">
+          <div className="flex items-center gap-3 mb-4 text-brand-gold">
             <Wallet className="h-5 w-5" />
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Gateway</span>
           </div>
-          <h2 className="text-2xl font-black italic tracking-tighter uppercase text-slate-900">Razorpay</h2>
+          <h2 className="text-2xl font-black italic tracking-tighter uppercase text-white">Razorpay</h2>
         </div>
       </div>
 
@@ -85,26 +85,26 @@ const PaymentsTab = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pt-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <History className="h-4 w-4 text-orange-500" />
+            <History className="h-4 w-4 text-brand-gold" />
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Transaction Registry</span>
           </div>
-          <h1 className="text-4xl font-black italic tracking-tighter uppercase text-slate-900">
-            Payment <span className="text-orange-500">Tracking</span>
+          <h1 className="text-4xl font-black italic tracking-tighter uppercase text-white">
+            Payment <span className="text-brand-gold">Tracking</span>
           </h1>
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
           <div className="relative flex-1 md:w-80 group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-brand-gold transition-colors" />
             <Input 
               placeholder="Search TXN ID or User ID..." 
-              className="pl-11 h-12 rounded-2xl bg-white border-slate-100 shadow-sm focus-visible:ring-orange-500"
+              className="pl-11 h-12 rounded-2xl bg-white/5 border border-white/10 focus-visible:ring-brand-gold"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <Button variant="outline" className="h-12 w-12 rounded-2xl border-slate-100 bg-white p-0 hover:bg-slate-50">
-            <DownloadCloud className="h-5 w-5 text-slate-600" />
+          <Button variant="outline" className="h-12 w-12 rounded-2xl border-white/10 bg-white/5 p-0 hover:bg-white/10">
+            <DownloadCloud className="h-5 w-5 text-slate-400" />
           </Button>
         </div>
       </div>
@@ -125,19 +125,19 @@ const PaymentsTab = () => {
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: idx * 0.03 }}
-            className="grid grid-cols-1 md:grid-cols-12 items-center gap-4 p-5 md:p-6 bg-white rounded-[2rem] border border-slate-50 shadow-sm hover:shadow-xl hover:border-orange-100 transition-all group"
+            className="grid grid-cols-1 md:grid-cols-12 items-center gap-4 p-5 md:p-6 bg-white/5 rounded-[2rem] border border-white/10 hover:border-brand-gold/40 transition-all group"
           >
             {/* COLUMN 1: TXN ID & Date */}
             <div className="col-span-1 md:col-span-4 flex items-center gap-4">
-              <div className="h-14 w-14 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-all shadow-sm">
+              <div className="h-14 w-14 rounded-2xl bg-white/10 text-slate-400 flex items-center justify-center group-hover:bg-brand-gold group-hover:text-brand-dark transition-all">
                 <CreditCard className="h-6 w-6" />
               </div>
               <div className="flex flex-col">
                 <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1">Ref ID</span>
-                <p className="text-[11px] font-mono font-black text-slate-500 uppercase tracking-tighter">
+                <p className="text-[11px] font-mono font-black text-slate-400 uppercase tracking-tighter">
                   {p.transaction_id || `REF-000${p.id}`}
                 </p>
-                <p className="text-sm font-black italic uppercase tracking-tighter text-slate-900 mt-1">
+                <p className="text-sm font-black italic uppercase tracking-tighter text-white mt-1">
                   {p.created_at ? new Date(p.created_at).toLocaleDateString('en-US', { 
                     month: 'short', day: 'numeric', year: 'numeric' 
                   }) : 'Date Unknown'}
@@ -150,10 +150,10 @@ const PaymentsTab = () => {
               <div className="flex flex-col">
                 <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1">Mapping</span>
                 <div className="flex items-center gap-2">
-                  <div className="h-6 w-6 rounded-lg bg-slate-900 flex items-center justify-center">
+                  <div className="h-6 w-6 rounded-lg bg-brand-gold/20 flex items-center justify-center">
                     <User className="h-3 w-3 text-white" />
                   </div>
-                  <span className="text-sm font-black text-slate-900 tracking-tighter italic">
+                  <span className="text-sm font-black text-white tracking-tighter italic">
                     UID-{p.user_id || 'N/A'}
                   </span>
                 </div>
@@ -166,7 +166,7 @@ const PaymentsTab = () => {
             {/* COLUMN 3: Amount */}
             <div className="col-span-1 md:col-span-2 text-left md:text-center">
                <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest block md:hidden mb-1">Value</span>
-              <span className="text-xl font-black italic tracking-tighter text-slate-900">
+              <span className="text-xl font-black italic tracking-tighter text-white">
                 ₹{Number(p.amount || 0).toLocaleString('en-IN')}
               </span>
             </div>
@@ -193,7 +193,7 @@ const PaymentsTab = () => {
 
         {/* Empty State */}
         {filtered.length === 0 && !loading && (
-          <div className="p-20 text-center bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200">
+          <div className="p-20 text-center bg-white/5 rounded-[3rem] border-2 border-dashed border-white/10">
             <AlertCircle className="h-12 w-12 text-slate-300 mx-auto mb-4" />
             <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">No transaction history found</p>
           </div>

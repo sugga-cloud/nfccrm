@@ -8,6 +8,7 @@ import PaymentsTab from "@/components/admin/tabs/PaymentsTab";
 import UsersTab from "@/components/admin/tabs/UsersTab";
 import StorageTab from "@/components/admin/tabs/StorageTab";
 import CreateProfile from "@/components/admin/tabs/CreateProfile";
+import CreateStaff from "@/components/admin/tabs/CreateStaff";
 
 const sidebarItems = [
   { label: "Analytics", value: "analytics" },
@@ -18,6 +19,7 @@ const sidebarItems = [
   { label: "User Management", value: "users" },
   { label: "Storage Monitoring", value: "storage" },
   { label: "Create Profile", value: "create" },
+  { label: "Create Staff", value: "staff" },
 ];
 
 const Admin = () => {
@@ -42,6 +44,7 @@ const Admin = () => {
       {tab === "users" && <UsersTab />}
       {tab === "storage" && <StorageTab />}
       {tab === "create" && <CreateProfile />}
+      {tab === "staff" && <CreateStaff />}
     </DashboardShell>
   );
 };

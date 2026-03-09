@@ -12,6 +12,7 @@ import Pricing from "./pages/Pricing";
 import PublicProfile from "./pages/PublicProfile";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
+import Staff from "./pages/Staff";
 import PlanDetail from "./pages/PlanDetail";
 import ProductDetail from "./pages/ProductDetail";
 import SubscriptionExpired from "./pages/SubscriptionExpired";
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/staff" element={<Staff />} />
             <Route path="/:username" element={<PublicProfile />} />
             <Route path="/plans/:id" element={<PlanDetail />} />
             <Route path="/products/:id" element={<ProductDetail />} />

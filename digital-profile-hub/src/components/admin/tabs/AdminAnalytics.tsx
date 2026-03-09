@@ -6,7 +6,7 @@ import { Users, UserCheck, IndianRupee, HardDrive, AlertCircle, Loader2 } from "
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid 
 } from 'recharts';
-const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
+const COLORS = ["#D4AF37", "#F8E391", "#10b981", "#6366f1", "#8b5cf6"];
 
 interface AnalyticsData {
   total_users: number;
@@ -41,34 +41,34 @@ const AdminAnalytics = () => {
 
   if (isLoading) return (
     <div className="flex h-96 w-full items-center justify-center gap-3">
-      <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+      <Loader2 className="h-6 w-6 animate-spin text-brand-gold" />
       <span className="text-sm font-bold uppercase tracking-widest text-slate-400">Gathering System Insights...</span>
     </div>
   );
 
   if (error || !data) return (
-    <div className="m-4 flex items-center gap-3 rounded-2xl bg-red-50 p-6 text-red-600 border border-red-100">
+    <div className="m-4 flex items-center gap-3 rounded-2xl bg-red-500/10 p-6 text-red-400 border border-red-500/20">
       <AlertCircle className="h-5 w-5" />
       <p className="font-bold">Failed to load system analytics. Please check your connection.</p>
     </div>
   );
 
   const stats = [
-    { name: "Total Users", value: data.total_users.toLocaleString(), icon: <Users className="h-4 w-4 text-blue-500" /> },
+    { name: "Total Users", value: data.total_users.toLocaleString(), icon: <Users className="h-4 w-4 text-brand-gold" /> },
     { name: "Active Profiles", value: data.active_profiles.toLocaleString(), icon: <UserCheck className="h-4 w-4 text-emerald-500" /> },
-    { name: "Total Revenue", value: `₹${data.total_revenue.toLocaleString()}`, icon: <IndianRupee className="h-4 w-4 text-orange-500" /> },
-    { name: "Storage Used", value: `${data.storage_gb} GB`, icon: <HardDrive className="h-4 w-4 text-slate-500" /> },
+    { name: "Total Revenue", value: `₹${data.total_revenue.toLocaleString()}`, icon: <IndianRupee className="h-4 w-4 text-brand-gold" /> },
+    { name: "Storage Used", value: `${data.storage_gb} GB`, icon: <HardDrive className="h-4 w-4 text-slate-400" /> },
   ];
 
   return (
     <div className="space-y-6 p-1">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">System Overview</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-white">System Overview</h1>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Global Platform Metrics</p>
         </div>
         {/* Visual Indicator of fresh data */}
-        <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-tighter">
+        <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-[10px] font-black uppercase tracking-tighter border border-emerald-500/20">
           <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
           Live Cache
         </div>
@@ -77,13 +77,13 @@ const AdminAnalytics = () => {
       {/* KPI Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((s) => (
-          <Card key={s.name} className="shadow-sm border-none ring-1 ring-slate-100">
+          <Card key={s.name} className="bg-white/5 border border-white/10 shadow-none rounded-2xl">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400">{s.name}</CardTitle>
               {s.icon}
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-black italic text-slate-900">{s.value}</div>
+              <div className="text-2xl font-black italic text-white">{s.value}</div>
             </CardContent>
           </Card>
         ))}
@@ -91,9 +91,9 @@ const AdminAnalytics = () => {
 
       {/* Charts Section */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4 lg:col-span-3 border-none shadow-sm ring-1 ring-slate-100 rounded-3xl overflow-hidden">
+        <Card className="col-span-4 lg:col-span-3 bg-white/5 border border-white/10 shadow-none rounded-3xl overflow-hidden">
           <CardHeader>
-            <CardTitle className="text-lg font-black italic uppercase tracking-tighter">Plan <span className="text-blue-600">Distribution</span></CardTitle>
+            <CardTitle className="text-lg font-black italic uppercase tracking-tighter text-white">Plan <span className="text-brand-gold">Distribution</span></CardTitle>
           </CardHeader>
           <CardContent className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -121,10 +121,10 @@ const AdminAnalytics = () => {
           </CardContent>
         </Card>
 
-   <Card className="col-span-4 border-none shadow-sm ring-1 ring-slate-100 rounded-3xl overflow-hidden bg-white">
+   <Card className="col-span-4 bg-white/5 border border-white/10 shadow-none rounded-3xl overflow-hidden">
   <CardHeader className="pb-2">
-    <CardTitle className="text-lg font-black italic uppercase tracking-tighter text-slate-900">
-      Revenue <span className="text-orange-500">Analytics</span>
+    <CardTitle className="text-lg font-black italic uppercase tracking-tighter text-white">
+      Revenue <span className="text-brand-gold">Analytics</span>
     </CardTitle>
   </CardHeader>
   
@@ -138,19 +138,19 @@ const AdminAnalytics = () => {
         >
           <defs>
             <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
-              <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+              <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.3}/>
+              <stop offset="95%" stopColor="#D4AF37" stopOpacity={0}/>
             </linearGradient>
           </defs>
           
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.1)" />
           
           <XAxis 
             dataKey="date" 
             axisLine={false}
             tickLine={false}
             // Fix: Rotate dates or show more intervals for clarity
-            tick={{ fontSize: 9, fontWeight: 800, fill: '#01060e' }}
+            tick={{ fontSize: 9, fontWeight: 800, fill: '#94a3b8' }}
             dy={10} 
             tickFormatter={(value) => {
                 const date = new Date(value);
@@ -164,13 +164,13 @@ const AdminAnalytics = () => {
             hide={false} // Set to true if you want a super-clean "Zoom" look
             axisLine={false}
             tickLine={false}
-            tick={{ fontSize: 10, fontWeight: 700, fill: '#030c16' }}
+            tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }}
             // ZOOM EFFECT: This scales the graph to the data range
             domain={['auto', 'auto']} 
           />
 
           <Tooltip 
-            cursor={{ stroke: '#f97316', strokeWidth: 1, strokeDasharray: '4 4' }}
+            cursor={{ stroke: '#D4AF37', strokeWidth: 1, strokeDasharray: '4 4' }}
             contentStyle={{ 
               borderRadius: '16px', 
               border: '1px solid #f1f5f9', 
@@ -184,19 +184,19 @@ const AdminAnalytics = () => {
           <Area 
             type="stepAfter" // Use 'stepAfter' or 'monotone' for different "zoom" feels
             dataKey="total" 
-            stroke="#f97316" 
+            stroke="#D4AF37" 
             strokeWidth={3} 
             fillOpacity={1} 
             fill="url(#revenueGradient)" 
             animationDuration={1500}
-            activeDot={{ r: 6, strokeWidth: 0, fill: '#f97316' }}
+            activeDot={{ r: 6, strokeWidth: 0, fill: '#D4AF37' }}
           />
         </AreaChart>
       </ResponsiveContainer>
     ) : (
-      <div className="h-full flex flex-col items-center justify-center text-slate-700">
-         <div className="h-1 bg-slate-100 w-2/3 rounded-full overflow-hidden">
-            <div className="h-full bg-slate-200 animate-pulse w-full" />
+      <div className="h-full flex flex-col items-center justify-center text-slate-400">
+         <div className="h-1 bg-white/10 w-2/3 rounded-full overflow-hidden">
+            <div className="h-full bg-brand-gold/30 animate-pulse w-full" />
          </div>
          <p className="text-[10px] font-black uppercase mt-4 tracking-widest">Awaiting Transaction Data...</p>
       </div>

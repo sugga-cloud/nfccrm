@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class AdminController extends Controller
@@ -302,9 +303,26 @@ private function saveRelatedData(Request $request, Profile $profile)
     // Social Links
     if ($request->filled('links')) {
         $linksArr = json_decode($request->links, true);
-        foreach ($linksArr as $platform => $url) {
-            if (!empty($url)) {
-                $profile->socialLinks()->create(['platform' => $platform, 'url' => $url]);
+
+        // Support both:
+        // 1) [{ platform: 'instagram', url: '...' }, ...]
+        // 2) { instagram: '...', facebook: '...' }
+        foreach ($linksArr as $key => $value) {
+            if (is_array($value)) {
+                // Array of objects form
+                $platform = $value['platform'] ?? null;
+                $url = $value['url'] ?? null;
+            } else {
+                // Key/value map form
+                $platform = $key;
+                $url = $value;
+            }
+
+            if (!empty($platform) && !empty($url)) {
+                $profile->socialLinks()->create([
+                    'platform' => $platform,
+                    'url' => $url,
+                ]);
             }
         }
     }
@@ -338,6 +356,49 @@ private function saveRelatedData(Request $request, Profile $profile)
         }
         $profile->products()->create($data);
     }
+
+    // Blogs
+    $blogsData = $request->input('blogs', []);
+    foreach ($blogsData as $idx => $b) {
+        $data = [
+            'title' => $b['title'] ?? '',
+            'description' => $b['description'] ?? '',
+        ];
+        if ($request->hasFile("blogs.$idx.image")) {
+            $path = $request->file("blogs.$idx.image")->store('profiles/blogs', 'public');
+            $data['featured_image'] = asset('storage/' . $path);
+        }
+        $profile->blogs()->create($data);
+    }
+
+    // Testimonials
+    $testimonialsData = $request->input('testimonials', []);
+    foreach ($testimonialsData as $t) {
+        if (empty($t['reviewer_name']) || empty($t['content'])) {
+            continue;
+        }
+        $profile->testimonials()->create([
+            'reviewer_name' => $t['reviewer_name'],
+            'content' => $t['content'],
+            'rating' => $t['rating'] ?? 5,
+            'is_visible' => isset($t['is_visible']) ? (bool)$t['is_visible'] : true,
+        ]);
+    }
+
+    // Terms & Conditions
+    if ($request->filled('terms_content')) {
+        $title = $request->input('terms_title', 'Terms and Conditions');
+        $content = $request->input('terms_content');
+
+        $profile->legalDocuments()->updateOrCreate(
+            ['type' => 'terms'],
+            [
+                'title' => $title,
+                'content' => $content,
+                'is_active' => true,
+            ]
+        );
+    }
 }
 
     /**
@@ -360,6 +421,31 @@ private function saveRelatedData(Request $request, Profile $profile)
             ->get();
 
         return response()->json($users);
+    }
+
+    /**
+     * ADMIN: Create a staff user (role_id = 3)
+     */
+    public function createStaff(Request $request)
+    {
+        $data = $request->validate([
+            'full_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+        ]);
+
+        $user = User::create([
+            'full_name' => $data['full_name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'role_id' => 3,
+            'is_active' => true,
+        ]);
+
+        return response()->json([
+            'message' => 'Staff user created successfully',
+            'user' => $user,
+        ], 201);
     }
 
     /**

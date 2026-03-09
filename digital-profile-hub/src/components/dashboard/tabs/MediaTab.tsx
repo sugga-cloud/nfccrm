@@ -39,7 +39,7 @@ const MediaTab = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["galleryData"] });
       toast.success("Gallery updated!", {
-        className: "bg-orange-600 text-white border-none",
+        className: "bg-brand-gold text-brand-dark border-none",
       });
     },
     onError: () => toast.error("Failed to upload images"),
@@ -66,7 +66,7 @@ const MediaTab = () => {
 
   if (isLoading) return (
     <div className="flex h-64 flex-col items-center justify-center gap-4">
-      <Loader2 className="h-10 w-10 animate-spin text-orange-500" />
+      <Loader2 className="h-10 w-10 animate-spin text-brand-gold" />
       <p className="text-slate-400 font-medium">Loading Gallery...</p>
     </div>
   );
@@ -84,7 +84,7 @@ const MediaTab = () => {
         <Button 
           onClick={() => fileInputRef.current?.click()} 
           disabled={uploadMutation.isPending}
-          className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl px-6 flex items-center gap-2 shadow-lg shadow-orange-200 transition-all active:scale-95"
+          className="bg-brand-gold hover:bg-brand-accent text-brand-dark rounded-xl px-6 flex items-center gap-2 shadow-lg shadow-brand-gold/20 transition-all active:scale-95"
         >
           {uploadMutation.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -104,11 +104,11 @@ const MediaTab = () => {
         />
       </div>
 
-      <Card className="border-slate-200 shadow-sm rounded-2xl overflow-hidden bg-white">
-        <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4">
+      <Card className="border-white/10 bg-white/5 rounded-2xl overflow-hidden">
+        <CardHeader className="bg-white/5 border-b border-white/10 py-4">
           <div className="flex items-center gap-2">
-            <LayoutGrid className="h-5 w-5 text-orange-500" />
-            <CardTitle className="text-base font-bold text-slate-700">Manage Media</CardTitle>
+            <LayoutGrid className="h-5 w-5 text-brand-gold" />
+            <CardTitle className="text-base font-bold text-white">Manage Media</CardTitle>
           </div>
         </CardHeader>
         
@@ -117,12 +117,12 @@ const MediaTab = () => {
             /* Empty State / Dropzone */
             <div 
               onClick={() => fileInputRef.current?.click()}
-              className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-slate-200 rounded-[2rem] bg-slate-50/50 hover:bg-orange-50/30 hover:border-orange-200 transition-all cursor-pointer group"
+              className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-white/10 rounded-[2rem] bg-white/5 hover:bg-brand-gold/10 hover:border-brand-gold/40 transition-all cursor-pointer group"
             >
               <div className="p-4 bg-white rounded-2xl shadow-sm mb-4 group-hover:scale-110 transition-transform">
                 <ImageIcon className="h-10 w-10 text-orange-400" />
               </div>
-              <p className="text-slate-900 font-bold">No images uploaded yet</p>
+              <p className="text-white font-bold">No images uploaded yet</p>
               <p className="text-slate-400 text-sm mt-1">Click to browse your business photos</p>
             </div>
           ) : (
@@ -131,7 +131,7 @@ const MediaTab = () => {
               {localGallery.map((item) => (
                 <div 
                   key={item.id} 
-                  className="group relative aspect-square overflow-hidden rounded-2xl border border-slate-100 bg-slate-100 shadow-sm"
+                  className="group relative aspect-square overflow-hidden rounded-2xl border border-white/10 bg-white/5"
                 >
                   <img 
                     src={item.media_url} 
@@ -157,7 +157,7 @@ const MediaTab = () => {
                   {/* Loading overlay for specifically being deleted */}
                   {deleteMutation.isPending && deleteMutation.variables === item.id && (
                     <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center">
-                       <Loader2 className="h-6 w-6 animate-spin text-orange-500" />
+                       <Loader2 className="h-6 w-6 animate-spin text-brand-gold" />
                     </div>
                   )}
                 </div>
@@ -166,7 +166,7 @@ const MediaTab = () => {
               {/* "Add More" Square */}
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="aspect-square rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 text-slate-400 hover:border-orange-300 hover:text-orange-500 hover:bg-orange-50/50 transition-all"
+                className="aspect-square rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-2 text-slate-400 hover:border-brand-gold/50 hover:text-brand-gold hover:bg-brand-gold/10 transition-all"
               >
                 <Plus className="h-6 w-6" />
                 <span className="text-[10px] font-black uppercase tracking-tighter">Add More</span>
@@ -176,11 +176,11 @@ const MediaTab = () => {
         </CardContent>
       </Card>
 
-      <div className="bg-orange-50 rounded-2xl p-4 flex items-start gap-3 border border-orange-100">
+      <div className="bg-brand-gold/10 rounded-2xl p-4 flex items-start gap-3 border border-brand-gold/30">
         <div className="mt-0.5">
-          <ImageIcon className="h-4 w-4 text-orange-600" />
+          <ImageIcon className="h-4 w-4 text-brand-gold" />
         </div>
-        <p className="text-xs text-orange-800 leading-relaxed font-medium">
+        <p className="text-xs text-slate-300 leading-relaxed font-medium">
           <strong>Tip:</strong> High-quality square images (1:1 ratio) look best in your business profile. You can upload multiple files at once.
         </p>
       </div>

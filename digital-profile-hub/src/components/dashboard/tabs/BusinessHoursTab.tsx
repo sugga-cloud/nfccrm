@@ -48,7 +48,7 @@ const BusinessHoursTab = () => {
       queryClient.setQueryData(["businessHours"], localHours);
       setIsEditing(false);
       toast.success("Schedule updated successfully!", {
-        className: "bg-orange-600 text-white border-none shadow-lg",
+        className: "bg-brand-gold text-brand-dark border-none shadow-lg",
       });
     },
     onError: () => {
@@ -85,7 +85,7 @@ const BusinessHoursTab = () => {
   // Loading State
   if (isLoading || localHours.length === 0) return (
     <div className="flex h-64 flex-col items-center justify-center gap-3">
-      <Loader2 className="h-10 w-10 animate-spin text-orange-500" />
+      <Loader2 className="h-10 w-10 animate-spin text-brand-gold" />
       <p className="text-slate-400 font-medium animate-pulse">Loading Schedule...</p>
     </div>
   );
@@ -103,7 +103,7 @@ const BusinessHoursTab = () => {
         {!isEditing ? (
           <Button 
             onClick={() => setIsEditing(true)} 
-            className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl px-6 flex items-center gap-2 shadow-md transition-all active:scale-95"
+            className="bg-brand-gold hover:bg-brand-accent text-brand-dark rounded-xl px-6 flex items-center gap-2 shadow-md transition-all active:scale-95"
           >
             <Pencil className="h-4 w-4" /> Edit Schedule
           </Button>
@@ -119,11 +119,11 @@ const BusinessHoursTab = () => {
       </div>
 
       {/* Main Schedule Card */}
-      <Card className="border-slate-200 shadow-sm rounded-2xl overflow-hidden bg-white">
-        <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4">
+      <Card className="border-white/10 bg-white/5 rounded-2xl overflow-hidden">
+        <CardHeader className="bg-white/5 border-b border-white/10 py-4">
           <div className="flex items-center gap-2">
-            <CalendarDays className="h-5 w-5 text-orange-500" />
-            <CardTitle className="text-base font-bold text-slate-700">Weekly Planner</CardTitle>
+            <CalendarDays className="h-5 w-5 text-brand-gold" />
+            <CardTitle className="text-base font-bold text-white">Weekly Planner</CardTitle>
           </div>
         </CardHeader>
         
@@ -134,13 +134,13 @@ const BusinessHoursTab = () => {
                 key={item.day} 
                 className={cn(
                   "flex flex-col sm:flex-row sm:items-center gap-4 p-5 lg:px-8 transition-colors",
-                  !item.isOpen && "bg-slate-50/50"
+                  !item.isOpen && "bg-white/5"
                 )}
               >
                 {/* Day Toggle Column */}
                 <div className="flex items-center justify-between sm:w-48">
                   <div className="space-y-0.5">
-                    <span className="font-bold text-slate-800">{item.day}</span>
+                    <span className="font-bold text-white">{item.day}</span>
                     <p className={cn(
                       "text-[10px] font-black uppercase tracking-widest",
                       item.isOpen ? "text-orange-500" : "text-slate-400"
@@ -152,7 +152,7 @@ const BusinessHoursTab = () => {
                     disabled={!isEditing}
                     checked={item.isOpen} 
                     onCheckedChange={(val) => updateDay(idx, "isOpen", val)}
-                    className="data-[state=checked]:bg-orange-500"
+                    className="data-[state=checked]:bg-brand-gold"
                   />
                 </div>
 
@@ -168,7 +168,7 @@ const BusinessHoursTab = () => {
                       value={item.open} 
                       disabled={!item.isOpen || !isEditing}
                       onChange={(e) => updateDay(idx, "open", e.target.value)} 
-                      className="pl-10 h-10 rounded-xl border-slate-200 focus-visible:ring-orange-500 disabled:opacity-100 disabled:bg-slate-50/50 disabled:text-slate-500 font-medium"
+                      className="pl-10 h-10 rounded-xl border-white/10 bg-white/5 focus-visible:ring-brand-gold disabled:opacity-100 disabled:bg-white/5 disabled:text-slate-500 font-medium"
                     />
                   </div>
                   
@@ -184,7 +184,7 @@ const BusinessHoursTab = () => {
                       value={item.close} 
                       disabled={!item.isOpen || !isEditing}
                       onChange={(e) => updateDay(idx, "close", e.target.value)} 
-                      className="pl-10 h-10 rounded-xl border-slate-200 focus-visible:ring-orange-500 disabled:opacity-100 disabled:bg-slate-50/50 disabled:text-slate-500 font-medium"
+                      className="pl-10 h-10 rounded-xl border-white/10 bg-white/5 focus-visible:ring-brand-gold disabled:opacity-100 disabled:bg-white/5 disabled:text-slate-500 font-medium"
                     />
                   </div>
                 </div>
@@ -196,7 +196,7 @@ const BusinessHoursTab = () => {
                     size="sm"
                     disabled={!item.isOpen || !isEditing}
                     onClick={() => copyToAll(idx)}
-                    className="h-9 px-4 rounded-lg text-slate-400 hover:text-orange-600 hover:bg-orange-50 transition-all"
+                    className="h-9 px-4 rounded-lg text-slate-400 hover:text-brand-gold hover:bg-brand-gold/20 transition-all"
                   >
                     <Copy className="mr-2 h-3.5 w-3.5" />
                     <span className="text-xs font-bold uppercase tracking-tight">Sync All</span>
@@ -208,11 +208,11 @@ const BusinessHoursTab = () => {
 
           {/* Footer Save Action */}
           {isEditing && (
-            <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end animate-in slide-in-from-bottom-2">
+            <div className="p-6 bg-white/5 border-t border-white/10 flex justify-end animate-in slide-in-from-bottom-2">
               <Button 
                 onClick={() => saveMutation.mutate(localHours)} 
                 disabled={saveMutation.isPending}
-                className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-6 px-10 rounded-xl shadow-lg shadow-orange-200 flex items-center gap-2 transition-all active:scale-95"
+                className="bg-brand-gold hover:bg-brand-accent text-brand-dark font-bold py-6 px-10 rounded-xl shadow-lg shadow-brand-gold/20 flex items-center gap-2 transition-all active:scale-95"
               >
                 {saveMutation.isPending ? (
                   <Loader2 className="h-5 w-5 animate-spin" />

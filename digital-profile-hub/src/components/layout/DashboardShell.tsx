@@ -1,5 +1,5 @@
 import { useState, ReactNode } from "react";
-import { Menu, X, ChevronRight } from "lucide-react";
+import { Menu, X, ChevronRight, Infinity } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/layout/Navbar";
 
@@ -21,35 +21,38 @@ const DashboardShell = ({ items, activeTab, onTabChange, children, title }: Dash
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#fafafa]">
+    <div className="flex min-h-screen flex-col bg-[#020611]">
       <Navbar />
       
-      <div className="flex flex-1 relative overflow-hidden"> {/* Added overflow-hidden to parent */}
+      <div className="flex flex-1 relative overflow-hidden">
         
-        {/* Mobile Toggle */}
+        {/* Mobile Toggle - Gold Gradient */}
         <button
-          className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f97316] text-white shadow-xl md:hidden active:scale-90 transition-transform"
+          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-gold text-brand-dark shadow-[0_8px_30px_rgb(212,175,55,0.3)] md:hidden active:scale-90 transition-all"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
           {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
 
-        {/* Sidebar */}
+        {/* Sidebar - Midnight Navy */}
         <aside className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 border-r border-slate-100 bg-white transition-all duration-300 ease-in-out md:sticky md:top-0 md:h-[calc(100vh-64px)] shrink-0",
-          sidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full md:translate-x-0"
+          "fixed inset-y-0 left-0 z-40 w-64 border-r border-white/5 bg-brand-dark transition-all duration-300 ease-in-out md:sticky md:top-0 md:h-[calc(100vh-80px)] shrink-0",
+          sidebarOpen ? "translate-x-0 shadow-2xl shadow-black" : "-translate-x-full md:translate-x-0"
         )}>
-          <div className="flex flex-col h-full py-6 px-4 overflow-hidden"> {/* Added overflow-hidden here */}
+          <div className="flex flex-col h-full py-8 px-4 overflow-hidden">
             
-            <div className="px-4 mb-8 shrink-0">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Console</p>
-              <h2 className="mt-1 text-xl font-black text-slate-900 italic tracking-tighter uppercase truncate">
+            <div className="px-4 mb-10 shrink-0">
+              <div className="flex items-center gap-2 mb-2">
+                <Infinity className="h-3 w-3 text-brand-gold/50" />
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Workspace</p>
+              </div>
+              <h2 className="text-xl font-black text-white italic tracking-tighter uppercase truncate">
                 {title}
               </h2>
             </div>
 
-            {/* Navigation - Logic for Truncation added here */}
-            <nav className="flex-1 space-y-1.5 overflow-y-auto pr-2 custom-scrollbar">
+            {/* Navigation */}
+            <nav className="flex-1 space-y-2 overflow-y-auto pr-2 custom-scrollbar">
               {items.map((item) => {
                 const isActive = activeTab === item.value;
                 return (
@@ -57,50 +60,58 @@ const DashboardShell = ({ items, activeTab, onTabChange, children, title }: Dash
                     key={item.value}
                     onClick={() => { onTabChange(item.value); setSidebarOpen(false); }}
                     className={cn(
-                      "group flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm transition-all duration-200",
+                      "group flex w-full items-center justify-between rounded-xl px-4 py-3.5 text-xs transition-all duration-300",
                       isActive
-                        ? "bg-orange-50 text-[#f97316] font-bold"
-                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                        ? "bg-brand-gold/10 text-brand-gold shadow-[inset_0_0_12px_rgba(212,175,55,0.05)] border border-brand-gold/20"
+                        : "text-slate-400 hover:bg-white/5 hover:text-white border border-transparent"
                     )}
                   >
-                    <div className="flex items-center gap-3 min-w-0"> {/* min-w-0 is the secret for truncation */}
-                      <span className={isActive ? "text-[#f97316] shrink-0" : "text-slate-400 shrink-0"}>
-                        {item.icon || <ChevronRight className="h-4 w-4 opacity-50" />}
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className={cn(
+                        "shrink-0 transition-colors",
+                        isActive ? "text-brand-gold" : "text-slate-500 group-hover:text-slate-300"
+                      )}>
+                        {item.icon || <ChevronRight className="h-3.5 w-3.5 opacity-50" />}
                       </span>
                       
-                      {/* TRUNCATED LABEL */}
-                      <span className="truncate text-left block w-full">
+                      <span className="truncate text-left block w-full font-black uppercase tracking-widest">
                         {item.label}
                       </span>
                     </div>
                     
                     {isActive && (
-                       <div className="h-1.5 w-1.5 rounded-full bg-[#f97316] shrink-0 ml-2" />
+                       <div className="h-1 w-1 rounded-full bg-brand-gold shadow-[0_0_8px_#D4AF37] shrink-0 ml-2" />
                     )}
                   </button>
                 );
               })}
             </nav>
 
-            <div className="mt-auto px-4 pt-4 border-t border-slate-50 shrink-0">
-               <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest text-center">
-                 v2.0.4 Premium
-               </p>
+            <div className="mt-auto px-4 pt-6 border-t border-white/5 shrink-0">
+               <div className="flex items-center justify-between">
+                 <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">
+                    v2.0.4 Premium
+                 </p>
+                 <div className="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]" />
+               </div>
             </div>
           </div>
         </aside>
 
         {/* Overlay */}
         {sidebarOpen && (
-          <div className="fixed inset-0 z-30 bg-slate-900/20 backdrop-blur-sm md:hidden" onClick={() => setSidebarOpen(false)} />
+          <div className="fixed inset-0 z-30 bg-black/60 backdrop-blur-md md:hidden" onClick={() => setSidebarOpen(false)} />
         )}
 
-        {/* Main content - Fixed overflow behavior */}
-        <main className="flex-1 min-w-0 bg-[#fafafa]"> {/* min-w-0 prevents content from pushing layout wide */}
-          <div className="mx-auto max-w-7xl p-4 md:p-8">
-             <div className="w-full overflow-hidden"> {/* Double wrapper for safety */}
-                {children}
-             </div>
+        {/* Main content - Contrast Background */}
+        <main className="flex-1 min-w-0 bg-[#050B1A] relative">
+          {/* Subtle Background Radial Gradient */}
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-gold/5 blur-[120px] pointer-events-none" />
+          
+          <div className="relative z-10 mx-auto max-w-7xl p-6 md:p-10">
+              <div className="w-full">
+                 {children}
+              </div>
           </div>
         </main>
       </div>

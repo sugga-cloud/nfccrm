@@ -42,7 +42,7 @@ const ProfileTab = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profileData"] });
       setIsEditing(false); // Lock the form again
-      toast({ title: "Success", description: "Profile updated successfully.", className: "bg-orange-600 text-white border-none" });
+      toast({ title: "Success", description: "Profile updated successfully.", className: "bg-brand-gold text-brand-dark border-none" });
     },
     onError: () => {
       toast({ title: "Error", description: "Failed to update profile", variant: "destructive" });
@@ -92,14 +92,14 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
   updateMutation.mutate(formData);
 };
-  if (isLoading) return <div className="flex h-64 items-center justify-center"><Loader2 className="animate-spin text-orange-500" /></div>;
+  if (isLoading) return <div className="flex h-64 items-center justify-center"><Loader2 className="animate-spin text-brand-gold" /></div>;
 
   return (
     <div className="max-w-4xl mx-auto pb-12 animate-in fade-in duration-500">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Profile</h1>
-          <p className="text-slate-500">View and manage your account details.</p>
+          <h1 className="text-3xl font-bold text-white">Profile</h1>
+          <p className="text-slate-400">View and manage your account details.</p>
         </div>
         
         {!isEditing ? (
@@ -111,7 +111,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
           </Button>
         ) : (
           <div className="flex gap-2">
-            <Button variant="outline" onClick={handleCancel} className="rounded-xl border-slate-200">
+            <Button variant="outline" onClick={handleCancel} className="rounded-xl border-white/10">
               <X className="h-4 w-4 mr-1" /> Cancel
             </Button>
           </div>
@@ -122,7 +122,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         {/* Imagery Section */}
         <div className="relative mb-20">
           <div 
-            className={`h-48 w-full rounded-2xl bg-orange-100 border border-slate-200 overflow-hidden relative ${isEditing ? 'cursor-pointer group' : ''}`}
+            className={`h-48 w-full rounded-2xl bg-white/5 border border-white/10 overflow-hidden relative ${isEditing ? 'cursor-pointer group' : ''}`}
             onClick={() => isEditing && coverInputRef.current?.click()}
           >
             <img 
@@ -139,7 +139,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
           <div className="absolute -bottom-12 left-8">
             <div 
-              className={`h-28 w-28 rounded-2xl border-4 border-white bg-slate-100 shadow-md overflow-hidden relative ${isEditing ? 'cursor-pointer group' : ''}`}
+              className={`h-28 w-28 rounded-2xl border-4 border-white/10 bg-white/5 shadow-md overflow-hidden relative ${isEditing ? 'cursor-pointer group' : ''}`}
               onClick={() => isEditing && profileInputRef.current?.click()}
             >
               <img src={previews.profile || profile?.profile_image} className="h-full w-full object-cover" alt="Avatar" />
@@ -155,14 +155,14 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
           <input type="file" ref={coverInputRef} hidden accept="image/*" onChange={(e) => handleFileChange(e, 'cover')} disabled={!isEditing} />
         </div>
 
-        <Card className="border-slate-200 shadow-sm rounded-xl">
+        <Card className="border-white/10 bg-white/5 rounded-xl">
           <CardContent className="p-6 md:p-8 space-y-8">
             
             {/* Identity */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Username</label>
-                <div className={`flex items-center rounded-lg border border-slate-200 overflow-hidden ${isEditing ? 'ring-2 ring-orange-500' : 'bg-slate-50'}`}>
+                <label className="text-sm font-semibold text-slate-300">Username</label>
+                <div className={`flex items-center rounded-lg border border-slate-200 overflow-hidden ${isEditing ? 'ring-2 ring-brand-gold' : 'bg-white/5'}`}>
                   {/* <div className="bg-orange-500 text-white px-4 py-2 font-bold h-11 flex items-center">@</div> */}
                   <Input 
                     name="username" 
@@ -174,10 +174,10 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Email</label>
+                <label className="text-sm font-semibold text-slate-300">Email</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
-                  <Input value={profile?.email} readOnly className="pl-10 h-11 bg-slate-50 border-slate-200 text-slate-500 cursor-not-allowed" />
+                  <Input value={profile?.email} readOnly className="pl-10 h-11 bg-white/5 border-white/10 text-slate-400 cursor-not-allowed" />
                 </div>
               </div>
             </div>
@@ -185,14 +185,14 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
             {/* Professional */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Company Name</label>
+                <label className="text-sm font-semibold text-slate-300">Company Name</label>
                 <div className="relative">
                   <Building2 className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
                   <Input name="company_name" defaultValue={profile?.company_name} readOnly={!isEditing} className={`pl-10 h-11 ${!isEditing ? 'bg-slate-50' : ''}`} />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Designation</label>
+                <label className="text-sm font-semibold text-slate-300">Designation</label>
                 <div className="relative">
                   <Briefcase className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
                   <Input name="designation" defaultValue={profile?.designation} readOnly={!isEditing} className={`pl-10 h-11 ${!isEditing ? 'bg-slate-50' : ''}`} />
@@ -201,37 +201,37 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Company Description</label>
+              <label className="text-sm font-semibold text-slate-300">Company Description</label>
               <Textarea 
                 name="company_description" 
                 defaultValue={profile?.company_description} 
                 readOnly={!isEditing}
                 rows={4} 
-                className={`rounded-lg resize-none p-4 ${!isEditing ? 'bg-slate-50' : ''}`}
+                className={`rounded-lg resize-none p-4 ${!isEditing ? 'bg-white/5' : ''}`}
               />
             </div>
 
             {/* Contact */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-white/10">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Phone</label>
-                <Input name="phone" defaultValue={profile?.phone} readOnly={!isEditing} className={`h-11 ${!isEditing ? 'bg-slate-50' : ''}`} />
+                <label className="text-sm font-semibold text-slate-300">Phone</label>
+                <Input name="phone" defaultValue={profile?.phone} readOnly={!isEditing} className={`h-11 ${!isEditing ? 'bg-white/5' : ''}`} />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">WhatsApp</label>
-                <Input name="whatsapp" defaultValue={profile?.whatsapp} readOnly={!isEditing} className={`h-11 ${!isEditing ? 'bg-slate-50' : ''}`} />
+                <label className="text-sm font-semibold text-slate-300">WhatsApp</label>
+                <Input name="whatsapp" defaultValue={profile?.whatsapp} readOnly={!isEditing} className={`h-11 ${!isEditing ? 'bg-white/5' : ''}`} />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Google Maps</label>
-                <Input name="google_map_link" defaultValue={profile?.google_map_link} readOnly={!isEditing} className={`h-11 ${!isEditing ? 'bg-slate-50' : ''}`} />
+                <label className="text-sm font-semibold text-slate-300">Google Maps</label>
+                <Input name="google_map_link" defaultValue={profile?.google_map_link} readOnly={!isEditing} className={`h-11 ${!isEditing ? 'bg-white/5' : ''}`} />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Address</label>
-                <Input name="address" defaultValue={profile?.address} readOnly={!isEditing} className={`h-11 ${!isEditing ? 'bg-slate-50' : ''}`} />
+                <label className="text-sm font-semibold text-slate-300">Address</label>
+                <Input name="address" defaultValue={profile?.address} readOnly={!isEditing} className={`h-11 ${!isEditing ? 'bg-white/5' : ''}`} />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Website</label>
-                <Input name="website" defaultValue={profile?.website} readOnly={!isEditing} className={`h-11 ${!isEditing ? 'bg-slate-50' : ''}`} />
+                <label className="text-sm font-semibold text-slate-300">Website</label>
+                <Input name="website" defaultValue={profile?.website} readOnly={!isEditing} className={`h-11 ${!isEditing ? 'bg-white/5' : ''}`} />
               </div>
             </div>
 
@@ -241,7 +241,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 <Button 
                   type="submit" 
                   disabled={updateMutation.isPending} 
-                  className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-6 px-10 rounded-xl shadow-lg transition-all flex items-center gap-2"
+                  className="bg-brand-gold hover:bg-brand-accent text-brand-dark font-bold py-6 px-10 rounded-xl shadow-lg transition-all flex items-center gap-2"
                 >
                   {updateMutation.isPending ? <Loader2 className="h-5 w-5 animate-spin"/> : <Save className="h-5 w-5" />}
                   Save Changes
