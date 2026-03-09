@@ -161,14 +161,14 @@ const BusinessHoursTab = () => {
                   <div className="relative flex-1">
                     <Clock className={cn(
                       "absolute left-3 top-2.5 h-4 w-4 transition-colors",
-                      isEditing && item.isOpen ? "text-orange-400" : "text-slate-300"
+                      isEditing && item.isOpen ? "text-orange-400" : "text-white"
                     )} />
                     <Input 
                       type="time" 
                       value={item.open} 
                       disabled={!item.isOpen || !isEditing}
                       onChange={(e) => updateDay(idx, "open", e.target.value)} 
-                      className="pl-10 h-10 rounded-xl border-white/10 bg-white/5 focus-visible:ring-brand-gold disabled:opacity-100 disabled:bg-white/5 disabled:text-slate-500 font-medium"
+                      className="pl-10 h-10 rounded-xl border-white/10 bg-white/5 focus-visible:ring-brand-gold disabled:opacity-100 disabled:bg-white/5 disabled:text-white font-medium"
                     />
                   </div>
                   
@@ -184,7 +184,7 @@ const BusinessHoursTab = () => {
                       value={item.close} 
                       disabled={!item.isOpen || !isEditing}
                       onChange={(e) => updateDay(idx, "close", e.target.value)} 
-                      className="pl-10 h-10 rounded-xl border-white/10 bg-white/5 focus-visible:ring-brand-gold disabled:opacity-100 disabled:bg-white/5 disabled:text-slate-500 font-medium"
+                      className="pl-10 h-10 rounded-xl border-white/10 bg-white/5 focus-visible:ring-brand-gold disabled:opacity-100 disabled:bg-white/5 disabled:text-white font-medium"
                     />
                   </div>
                 </div>
