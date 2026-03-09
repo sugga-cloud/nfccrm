@@ -312,8 +312,7 @@ const CreateProfile = () => {
 
     try {
       const url = isEdit && profileId ? `/admin/profiles/${profileId}` : "/admin/profiles";
-      const method = "POST";
-      data.append('_method', 'PUT'); // Add this!
+      if (isEdit && profileId) data.append("_method", "PUT"); // Method spoofing for Laravel update
       // include theme & ui selection in the submission
       if (selectedThemeId) data.append("theme_id", String(selectedThemeId));
       if (selectedUiId) data.append("interface_id", String(selectedUiId));
