@@ -111,7 +111,7 @@ const ProfilesList = () => {
                     <User className="h-7 w-7" />
                   </div>
                   <div className="overflow-hidden">
-                    <div className="font-black italic uppercase tracking-tighter text-lg text-slate-900 truncate">
+                    <div className="font-black italic uppercase tracking-tighter text-lg text-white truncate">
                       {p.username}
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold truncate">

@@ -24,30 +24,19 @@ const Footer = () => {
           
           {/* Logo & Copyright */}
           <div className="flex flex-col items-center md:items-start gap-2">
-            <div className="flex items-center gap-2">
-              <Infinity className="h-5 w-5 text-brand-gold" />
-              <h3 className="text-xl font-black tracking-tighter text-white uppercase">
-                MYWEB<span className="text-brand-gold">LINK</span>
-              </h3>
+            <div className="flex items-center  gap-2 bg-white h-20 pb-2 rounded-full">
+              <img
+  src="/logo.PNG"
+  alt="MyWebLink logo"
+  className="h-auto w-60 object-contain"
+/>
             </div>
             
             <div className="flex flex-col items-center md:items-start">
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">
                 © {new Date().getFullYear()} All Rights Reserved.
               </p>
-              
-              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">
-                Developed by{" "}
-                <a 
-                  href="https://cognivox.online" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-slate-400 hover:text-brand-gold transition-colors duration-300 underline-offset-4 decoration-brand-gold/30 underline"
-                >
-                  Cognivox Technology
-                </a>
-              </p>
-            </div>
+            </div>x
           </div>
 
           {/* Dynamic Navigation */}

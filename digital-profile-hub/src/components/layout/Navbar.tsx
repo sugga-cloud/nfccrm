@@ -37,11 +37,14 @@ const Navbar = () => {
       <div className="container mx-auto px-4 flex h-14 items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <img
-            src="/logo.PNG"
-            alt="MyWebLink logo"
-            className="h-18 md:h-12 w-auto object-contain"
-          />
+        <div className="flex items-center  gap-2 bg-white h-10 md:h-16 pb-2 rounded-full">
+        <img
+  src="/logo.PNG"
+  alt="MyWebLink logo"
+  className="h-auto w-28 object-contain md:w-60"
+/>
+            </div>
+            
         </Link>
 
         {/* Desktop Navigation */}

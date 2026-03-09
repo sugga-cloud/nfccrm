@@ -9,7 +9,7 @@ import UsersTab from "@/components/admin/tabs/UsersTab";
 import StorageTab from "@/components/admin/tabs/StorageTab";
 import CreateProfile from "@/components/admin/tabs/CreateProfile";
 import CreateStaff from "@/components/admin/tabs/CreateStaff";
-
+import RazorpaySettings from "@/components/admin/tabs/RazorpaySettings";
 const sidebarItems = [
   { label: "Analytics", value: "analytics" },
   { label: "Manage Profiles", value: "profiles" },
@@ -20,6 +20,7 @@ const sidebarItems = [
   { label: "Storage Monitoring", value: "storage" },
   { label: "Create Profile", value: "create" },
   { label: "Create Staff", value: "staff" },
+  { label: "Razorpay Settings", value: "razorpay" },
 ];
 
 const Admin = () => {
@@ -45,6 +46,7 @@ const Admin = () => {
       {tab === "storage" && <StorageTab />}
       {tab === "create" && <CreateProfile />}
       {tab === "staff" && <CreateStaff />}
+      {tab === "razorpay" && <RazorpaySettings />}
     </DashboardShell>
   );
 };

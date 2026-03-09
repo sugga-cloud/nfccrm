@@ -2,10 +2,13 @@ import { useState, useEffect } from "react";
 import DashboardShell from "@/components/layout/DashboardShell";
 import ProfilesList from "@/components/admin/tabs/ProfilesList";
 import CreateProfile from "@/components/admin/tabs/CreateProfile";
-
+import PaymentsTab from "@/components/admin/tabs/PaymentsTab";
+import UsersTab from "@/components/admin/tabs/UsersTab";
 const sidebarItems = [
   { label: "Manage Profiles", value: "profiles" },
   { label: "Create Profile", value: "create" },
+  { label: "Track Payments", value: "payments" },
+  { label: "User Management", value: "users" },
 ];
 
 const Staff = () => {
@@ -29,6 +32,8 @@ const Staff = () => {
     >
       {tab === "profiles" && <ProfilesList />}
       {tab === "create" && <CreateProfile />}
+      {tab === "payments" && <PaymentsTab />}
+      {tab === "users" && <UsersTab />}
     </DashboardShell>
   );
 };

@@ -31,48 +31,73 @@ const PlanDetail = () => {
     setProcessing(true);
 
     try {
+      // 1. Create the Order
       const { data: order } = await api.post("/payments/create-order", { 
         plan_id: plan.id 
       });
       
+      // 2. Fallback for Simulation (if SDK fails to load)
       if (typeof (window as any).Razorpay === "undefined") {
         toast.info("Razorpay SDK not found. Simulating transaction...");
         await new Promise(resolve => setTimeout(resolve, 1500));
-        await api.post("/payments/verify", { plan_id: plan.id, simulation: true });
+        
+        // Pass a mock order ID so the backend knows which 'pending' sub to activate
+        await api.post("/payments/verify", { 
+            plan_id: plan.id, 
+            razorpay_order_id: order.id, // Link to the pending sub created in Step 1
+            simulation: true 
+        });
+        
         toast.success(`Welcome to ${plan.name}!`);
         navigate("/dashboard");
         return;
       }
 
+      // 3. Real Razorpay Options
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        // Best Practice: Use the key sent by your backend settings
+        key: order.razorpay_key || import.meta.env.VITE_RAZORPAY_KEY_ID, 
         amount: order.amount,
         currency: "INR",
         name: "MyWebLink Premium",
         description: `Activation: ${plan.name}`,
-        order_id: order.id,
+        order_id: order.id, // Real Razorpay Order ID
         handler: async (response: any) => {
           try {
-            await api.post("/payments/verify", { ...response, plan_id: plan.id });
+            // response contains: razorpay_payment_id, razorpay_order_id, razorpay_signature
+            await api.post("/payments/verify", { 
+                ...response, 
+                plan_id: plan.id 
+            });
             toast.success("Identity Verified! Subscription Active.");
             navigate("/dashboard");
           } catch (err) {
             toast.error("Verification failed. Please contact support.");
           }
         },
-        prefill: { name: "Executive Member", email: "member@myweblink.com" },
-        theme: { color: "#D4AF37" }, // Updated to Gold
+        // prefill should ideally come from your Auth user state
+        prefill: { 
+            name: "Sazid Husain", // Replace with dynamic data
+            email: "sazid@example.com" 
+        },
+        theme: { color: "#D4AF37" }, 
       };
 
       const rzp = new (window as any).Razorpay(options);
+      
+      // Handle payment failure (user closes modal or card fails)
+      rzp.on('payment.failed', function (response: any){
+          toast.error("Payment failed: " + response.error.description);
+          console.log(response.error);
+      });
+
       rzp.open();
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Initialization failed");
     } finally {
       setProcessing(false);
     }
-  };
-
+};
   if (isLoading) return (
     <div className="h-screen bg-brand-dark flex flex-col items-center justify-center gap-4">
       <Loader2 className="h-10 w-10 animate-spin text-brand-gold" />

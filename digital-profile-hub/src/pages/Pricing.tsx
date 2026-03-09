@@ -57,8 +57,8 @@ const Pricing = () => {
             
             <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase text-white leading-tight">
               Elevate Your <br />
-              <span className="bg-gold-gradient bg-clip-text text-transparent italic font-serif lowercase tracking-normal px-2">
-                influence.
+              <span className="bg-gold-gradient bg-clip-text text-transparent lowercase tracking-normal px-2">
+                Influence.
               </span>
             </h1>
             

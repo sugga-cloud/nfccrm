@@ -11,7 +11,7 @@ class Subscription extends Model
 
     protected $fillable = [
         'user_id','plan_id','start_date',
-        'end_date','auto_renew','status'
+        'end_date','auto_renew','status','razorpay_order_id', // Added this
     ];
 
     public function user()
@@ -20,9 +20,16 @@ class Subscription extends Model
     }
 
     public function plan()
-{
-    return $this->belongsTo(SubscriptionPlan::class, 'plan_id');
-}
+    {
+        return $this->hasOneThrough(
+            SubscriptionPlan::class, 
+            Subscription::class, 
+            'id', // Foreign key on subscriptions table
+            'id', // Foreign key on subscription_plans table
+            'subscription_id', // Local key on payments table
+            'plan_id' // Local key on subscriptions table
+        );
+    }
 
     public function payments()
     {

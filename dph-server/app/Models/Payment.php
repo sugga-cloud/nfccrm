@@ -12,7 +12,7 @@ class Payment extends Model
     protected $fillable = [
         'user_id','subscription_id',
         'amount','payment_method',
-        'transaction_id','status'
+        'transaction_id','status',
     ];
 
     public function user()

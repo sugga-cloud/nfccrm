@@ -15,5 +15,6 @@ class Service extends Model
     {
         return $this->belongsTo(Profile::class);
     }
+    
 }
 

@@ -26,6 +26,10 @@ Route::get('/', function () {
     ]);
 });
 
+// routes/api.php
+
+// This endpoint must be public
+Route::post('/webhooks/razorpay', [PaymentController::class, 'handleWebhook']);
 // Auth
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -136,6 +140,9 @@ Route::middleware(['auth:sanctum', 'role:admin,staff'])->prefix('admin')->group(
     Route::delete('/plans/{plan}', [AdminController::class, 'destroyPlan']);
     Route::get('/storage-stats', [AdminController::class, 'storageStats']); // For StorageTab
     Route::patch('/profiles/{profile}/toggle', [AdminController::class, 'toggleActive']);
+    // Razorpay Configuration Routes
+    Route::get('/razorpay-settings', [PaymentController::class, 'getRazorpaySettings']);
+    Route::post('/update-razorpay-settings', [PaymentController::class, 'updateRazorpaySettings']);
 });
 Route::post('/profiles/{id}/track-click', [ProfileController::class, 'trackClick']);
 // Public product routes

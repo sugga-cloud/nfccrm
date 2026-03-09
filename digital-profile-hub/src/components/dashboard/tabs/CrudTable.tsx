@@ -266,7 +266,7 @@ const CrudTable = ({ title, endpoint }: CrudTableProps) => {
                       value={isProduct ? formData.name : formData.title} 
                       onChange={(e) => setFormData({ ...formData, [isProduct ? "name" : "title"]: e.target.value })} 
                       placeholder={isProduct ? "Product Name" : isBlog ? "Article Title" : "Service Name"}
-                      className="h-11 rounded-xl bg-white/5 border border-white/10 font-bold focus-visible:ring-2 focus-visible:ring-brand-gold/20 transition-all"
+                      className="h-11 text-white rounded-xl bg-white/5 border border-white/10 font-bold focus-visible:ring-2 focus-visible:ring-brand-gold/20 transition-all"
                       required 
                     />
                   </div>
@@ -277,7 +277,7 @@ const CrudTable = ({ title, endpoint }: CrudTableProps) => {
                         type="number" 
                         value={formData.price} 
                         onChange={(e) => setFormData({ ...formData, price: e.target.value })} 
-                        className="h-11 rounded-xl bg-white/5 border border-white/10 font-black text-brand-gold focus-visible:ring-2 focus-visible:ring-brand-gold/20"
+                        className="h-11 text-white rounded-xl bg-white/5 border border-white/10 font-bold focus-visible:ring-2 focus-visible:ring-brand-gold/20"
                         placeholder="Price (₹)"
                         required
                       />
@@ -290,7 +290,7 @@ const CrudTable = ({ title, endpoint }: CrudTableProps) => {
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
                       placeholder={isBlog ? "Write your blog content or excerpt..." : "Short description for customers..."}
                       className={cn(
-                        "rounded-xl bg-white/5 border border-white/10 px-4 py-3 focus-visible:ring-2 focus-visible:ring-brand-gold/20 resize-none text-sm min-h-[120px] transition-all",
+                        "text-white rounded-xl bg-white/5 border border-white/10 px-4 py-3 focus-visible:ring-2 focus-visible:ring-brand-gold/20 resize-none text-sm min-h-[120px] transition-all",
                         isBlog ? "h-48" : "h-28"
                       )}
                     />

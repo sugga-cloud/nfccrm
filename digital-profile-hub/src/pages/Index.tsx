@@ -29,8 +29,8 @@ const Index = () => {
 
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-8xl text-white leading-[0.85] mb-6">
           YOUR IDENTITY <br />
-          <span className="bg-gradient-to-r from-[#D4AF37] via-[#F8E391] to-[#B8860B] bg-clip-text text-transparent font-serif italic lowercase tracking-normal">
-            simplified.
+          <span className="bg-gradient-to-r from-[#D4AF37] via-[#F8E391] to-[#B8860B] bg-clip-text text-transparent lowercase tracking-normal">
+            Simplified.
           </span>
         </h1>
 
