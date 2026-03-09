@@ -120,12 +120,12 @@ const BusinessHoursTab = () => {
 
       {/* Main Schedule Card */}
       <Card className="border-white/10 bg-white/5 rounded-2xl overflow-hidden">
-        <CardHeader className="bg-white/5 border-b border-white/10 py-4">
+        {/* <CardHeader className="bg-white/5 border-b border-white/10 py-4">
           <div className="flex items-center gap-2">
             <CalendarDays className="h-5 w-5 text-brand-gold" />
             <CardTitle className="text-base font-bold text-white">Weekly Planner</CardTitle>
           </div>
-        </CardHeader>
+        </CardHeader> */}
         
         <CardContent className="p-0">
           <div className="divide-y divide-slate-100">
